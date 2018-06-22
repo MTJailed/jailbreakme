@@ -11,14 +11,12 @@
             
             /* Configuration and Initialization */
             window.fuckoffwenetakidcounter = 0;
-            window.module_base = "modules/";
+            window.module_base = "modules";
             
             /* Module imports */
             module('sha1');
             module('sha');
             module('md5');
-            module('devicesupport');
-            module('offsets');
             module('sploit');
             
             /* Common functions */
@@ -33,112 +31,6 @@
                 document.write(str.toString()+"<br>");
             }
         
-            /* The exploit context is the logic for determining what exploit is used to jailbreak the device */
-            var ExploitContext = function ExploitContext() {
-            
-                //Offsets initialization, see offsets.module.js for more details
-                this.InitOffsets = function InitOffsets() {
-                    
-                    //Firstly detect the client's device and it's specs and set it as a global
-                    var device = detectDevice();
-                    window.chosendevice = device;
-                    
-                    //Then check if the device matches the constraints for eligibility to exploit
-                    if(!device.is_mobile || !device.is_safari) {
-                        puts("Failed. This exploit only works on MobileSafari.");
-                        return false;
-                    
-                    //At this time we do not support Apple Watch or Apple TV yet
-                    } else if(device.devicetype != "iPhone" && device.devicetype != "iPad") {
-                        puts("Failed. This exploit only works on iPad or iPhone.");
-                        return false;
-                    
-                    //There aren't any exploits available yet for iOS 11.4 and up
-                    } else if(device.sw_vers >= 11.4 || parseInt(device.safari_vers) > 604.1) {
-                        puts("Failed. The vulnerabilities used in this exploit are patched in iOS "+device.sw_vers);
-                        return false;
-                    
-                    //If all constaints were met we end up here and initialize the offsets for the device and firmware version
-                    } else {
-                        window.chosendevice.offsets = Offsets(device.sw_vers, device.productname); //set the offsets global
-                        
-                        if(window.chosendevice.offsets) { //Check if we were able to get the offsets and display them
-                            alert("Chosen offsets:" + JSON.stringify(window.chosendevice.offsets));
-                            
-                        } else {
-                            //Devices below iOS 10 do not require offsets.
-                            if(window.chosendevice.sw_vers >= 10) {
-                                puts("offsets missing for "+window.chosendevice.productname+", please report them.");
-                                return false;
-                            } else {
-                                puts("Offsets missing but not needed for your older device. :)");
-                                return true;
-                            }
-                        }
-                        
-                        //If we have offsets then we return true indicating that the initialization of offsets has succeeded
-                        return true;
-                    }
-                };
-                
-                function printspecs() {
-                    var device = window.chosendevice;
-                    if(!device) puts('Please initialize your device first.');
-                    //Print out the most important properties of the device
-                    puts("<b>"+(device.productname ? device.productname : device.devicetype)+"</b> "+device.sw_vers+" ("+device.sw_build+")");
-                    //puts("<b>Dots per inch: </b>"+device.dpi);
-                    puts("<b>GPU: </b>"+device.gpu);
-                };
-            
-                //The exploit strategy determination happens here and the exploit is also started her
-                this.run = function() {
-                    
-                    //Initialize
-                    var strategy = false;
-                    var device = window.chosendevice;
-                    
-                    //check if we have a detected device to work with
-                    if(!device) puts('Please initialize the device first.');
-            
-                    printspecs(); //print the most important specifications of the device
-            
-                    /* Strategy constraints. */
-                    
-                    //Tihmstars jailbreak me for 9.0 - 9.3.4
-                    if(window.chosendevice.sw_vers >= 9.0 && window.chosendevice.sw_vers < 9.35) {
-                        puts("Chose to use Tihmstars jailbreak me");
-                        strategy = wk91go; //See sploit.module.js for more info
-                    
-                    //Niklas B's jailbreak me for 11.3.1 (safari may lie saying 11.3 instead of 11.3.1)
-                    } else if(window.chosendevice.sw_vers == 11.3 || window.chosendevice.sw_vers == 11.31) {
-                        puts("Chose to use Niklas B's jailbreak me.");
-                        
-                        //Constraints as currently only iPhone 8 and 8+ are supported for Niklas's jailbreak me
-                        if(!(
-                             window.chosendevice.productname.indexOf('iPhone 8') > -1 ||
-                             window.chosendevice.productname.indexOf('iPhone 8+') > -1 || window.chosendevice.productname.indexOf('iPhone 6S') > -1)
-                           )
-                        {
-                            puts('Your '+(window.chosendevice.productname ? window.chosendevice.productname.join(' or ') : 'Unknown')+ " is not supported");
-                            return;
-                        }
-                       strategy = wk113go;
-                    }
-                
-                    //We are about to launch the exploit and will handle errors accordingly
-                    try {
-                        
-                        if(strategy) { //without an exploit strategy to use there is nothing to do.
-                            strategy();
-                        } else {
-                            puts("Your device or ios version isn't supported.");
-                        }
-                        
-                    } catch(exc) {
-                        puts('<b style"color:red">Exception occured: "'+exc);
-                    }
-                };
-            };
         </script>
     </head>
     <body>
@@ -155,11 +47,15 @@
                 }
             }
             
+
+            function clear_callback() {
+                document.getElementById('go').innerText=""; //clear the callback element
+            }
+
             //This function is called when the users presses the start button
             var go = function() {
-                document.getElementById('go').innerText=""; //clear the callback element
-                var exploit = new ExploitContext(); //Initialize a new exploit context
-                (exploit.InitOffsets() ? exploit.run() : vm_wenetakid_prot()); //Start exploit or gtfo
+                clear_callback();
+                if(!sploit_main()) vm_wenetakid_prot(); 
             };
         </script>
         <header>
