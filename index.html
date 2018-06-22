@@ -21,21 +21,6 @@
             
             /* Common functions */
             
-            //Overwrite document.write to write to our callback element
-            document.write = function(x){
-                document.getElementById('go').innerHTML+=x;
-            };
-        
-            //Simple function to write formatted strings to the callback element
-            function puts(str) {
-                document.write(str.toString()+"<br>");
-            }
-        
-        </script>
-    </head>
-    <body>
-        <script type="text/javascript">
-            //When eta kids end up here
             function vm_wenetakid_prot() {
                 window.fuckoffwenetakidcounter++;
                 if(window.fuckoffwenetakidcounter==3) {
@@ -52,6 +37,21 @@
                 document.getElementById('go').innerText=""; //clear the callback element
             }
 
+
+            //Overwrite document.write to write to our callback element
+            document.write = function(x){
+                document.getElementById('go').innerHTML+=x;
+            };
+        
+            //Simple function to write formatted strings to the callback element
+            function puts(str) {
+                document.write(str.toString()+"<br>");
+            }
+        
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
             //This function is called when the users presses the start button
             var go = function() {
                 clear_callback();
