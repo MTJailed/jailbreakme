@@ -431,7 +431,7 @@ var wk113go = function() {
     if(!has_offsets) return fail(-1);
     
     //retrieve the shellcode containing the empty_list exploit by Ian Beer (Needs some work, doesn't check for request status code)
-    fetch('payloads/emptylist.bin').then((response) => {
+    fetch('payloads/11_3_1/emptylist.bin').then((response) => {
         response.arrayBuffer().then((buffer) => {
             try{
                 shellcode_length = buffer.byteLength; //Get the length of the shellcode array
@@ -715,16 +715,19 @@ var wk113go = function() {
     }
     
     function wk91go(){
-        console.log("Downloading resources");
-        puts("Downloading Resources");
+        console.log("Downloading resources"); puts("Downloading Resources");
         setTimeout(function () {
+
+            //Start downloading all of the resources.
             filestream = load_binary_resource("payloads/91_934_32/stage1.bin")
-            payload_tar = getArrFromResource(load_binary_resource("payloads/91_934_32/payload/tar"))
-            payload_launchctl = getArrFromResource(load_binary_resource("payloads/91_934_32/payload/launchctl"))
-            payload_offsets = getArrFromResource(load_binary_resource("payloads/91_934_32/payload/offsets.json"))
-            puts("Downloading Cydia");
+            payload_tar = getArrFromResource(load_binary_resource("payloads/91_934_32/tar"))
+            payload_launchctl = getArrFromResource(load_binary_resource("payloads/91_934_32/launchctl"))
+            payload_offsets = getArrFromResource(load_binary_resource("payloads/91_934_32/offsets.json"))
+            
+            console.log("Downloading Cydia"); puts("Downloading Cydia");
+            
             setTimeout(function () {
-                payload_cydia = getArrFromResource(load_binary_resource("payloads/91_934_32/payload/Cydia.tar"))
+                payload_cydia = getArrFromResource(load_binary_resource("payloads/91_934_32/Cydia.tar"))
                 wk91sploit();
             }, 100);
         }, 100);

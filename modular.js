@@ -27,7 +27,7 @@ var Using = function(resourceurl, type) {
     if(typeof resourceurl !== 'string') { resourceurl = resourceurl.toString();}
     
     //Detect whether it is an external or internal resource
-    if(window.module_base && !resourceurl.includes('://') > -1) {
+    if(window.module_base && resourceurl.indexOf('://') == -1) {
         resourceurl = window.module_base + '/' + resourceurl;
     }
     
@@ -42,7 +42,7 @@ var Using = function(resourceurl, type) {
         tag.type = 'text/javascript';
         tag.id = 'script'+new Date().toString();
         tag.addEventListener('load', function(){
-             console.log('[Modular]: Loaded script...', 'yellow');
+            console.log('[Modular]: Loading ' + tag.src, 'yellow');
          }, false);
         document.head.appendChild(tag);
         document.getElementById(tag.id).remove();
@@ -54,7 +54,7 @@ var Using = function(resourceurl, type) {
         tag.type = 'text/css';
         tag.id = 'style'+new Date().toString();
         tag.addEventListener('load', function(){
-            console.log('[Modular]: Loaded style...', 'yellow');
+            console.log('[Modular]: Loading ' + resourceurl, 'yellow');
          }, false);
         document.head.appendChild(tag);
         document.getElementById(tag.id).remove();
@@ -63,6 +63,7 @@ var Using = function(resourceurl, type) {
     else {
         console.error('[Modular] Unknown type');
     }
+
 };
 
 //Derratives

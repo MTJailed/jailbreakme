@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Offsets provider Unit Test</title>
+	<script type="text/javascript" src="../modular.js"></script>
+	<script type="text/javascript">
+		window.exceptionarr = [];
+		pass = function(x){console.error(x);alert(x);window.exceptionarr.push(x);};
+		document.write = function(x){document.writeln(x+"<br>");};
+		try {
+			window.module_base = "../modules/";
+			module('sha1');
+            module('sha');
+            module('md5');
+            module('devicesupport');
+            module('offsets');
+            module('sploit');
+		} catch(exception) {
+			pass(exception);
+		}
+
+		function test2(){
+			try {
+				window.test = new Offsets();
+				window.test = new Offsets("iPhone 2G");
+				window.test = new Offsets("iPhone 2G", 1);
+				window.test = new Offsets("iPhone 6S", 11.3);
+				document.write("new Offsets() succeeded!");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			if(window.exceptionarr.length === 0) {
+				document.write("offsets module seems to work!");
+			} else {
+				document.write("there have been errors in the offsets module.");
+			}
+		} //EOF test2()
+
+		</script>
+</head>
+<body>
+	Offset detection works?
+	<button onclick="test2()">test</button>
+</body>
+</html>

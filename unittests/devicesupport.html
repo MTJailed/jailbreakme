@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DeviceSupport Unit Test</title>
+	<script type="text/javascript" src="../modular.js"></script>
+	<script type="text/javascript">
+		window.exceptionarr = [];
+		pass = function(x){console.error(x);alert(x);window.exceptionarr.push(x);};
+		document.write = function(x){document.writeln(x+"<br>");};
+		try {
+			window.module_base = "../modules";
+			module('sha1');
+            module('sha');
+            module('md5');
+            module('devicesupport');
+            module('offsets');
+            module('sploit');
+            document.write('Loading of modules succeeded.');
+		} catch(exception) {
+			pass(exception);
+		}
+
+		function test2() {
+			try {
+				window.test = GetDPI();
+				document.write("GetDPI() succeeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = GetGPU();
+				document.write("GetGPU() succeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = getProductName();
+				document.write("GetProductName() succeeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = getOSVersionFromUA();
+				document.write("getOSVersionFromUA() succeeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = getBuildFromUA();
+				document.write("getBuildFromUA() succeeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = BuildToVerson();
+				window.test = BuildToVerson("12H321");
+				if(window.test != 8.41) {
+					throw new Error('BuildToVerson mismatch version, expected 8.41, got: '+window.test);
+				} else {
+					document.write("BuildToVerson() succeeded.");
+				}
+			} catch(exception) {
+				pass(exception);
+			}
+
+			try {
+				window.test = detectDevice();
+				document.write("detectDevice() succeeded.");
+			} catch(exception) {
+				pass(exception);
+			}
+
+			if(window.exceptionarr.length === 0) {
+				document.write("devicesupport module seems to work!");
+			} else {
+				document.write("there have been errors in the devicesupport module.");
+			}
+		} //EOF test2()
+
+		</script>
+</head>
+<body>
+	Device detection works?
+	<button onclick="test2()">test</button>
+</body>
+</html>
