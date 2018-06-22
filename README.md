@@ -1,6 +1,7 @@
 # jailbreak me
 A webbased jailbreak solution unifying existing jailbreak me solutions and new ones.
 
+Created by Sem Voigtländer
 
 ## Support
 

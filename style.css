@@ -1,0 +1,54 @@
+/***
+ *        /$$$$$           /$$ /$$ /$$                                     /$$             /$$      /$$                   /$$     /$$        /$$$$$$ 
+ *       |__  $$          |__/| $$| $$                                    | $$            | $$$    /$$$                 /$$$$   /$$$$       /$$$_  $$
+ *          | $$  /$$$$$$  /$$| $$| $$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$ | $$   /$$      | $$$$  /$$$$  /$$$$$$       |_  $$  |_  $$      | $$$$\ $$
+ *          | $$ |____  $$| $$| $$| $$__  $$ /$$__  $$ /$$__  $$ |____  $$| $$  /$$/      | $$ $$/$$ $$ /$$__  $$        | $$    | $$      | $$ $$ $$
+ *     /$$  | $$  /$$$$$$$| $$| $$| $$  \ $$| $$  \__/| $$$$$$$$  /$$$$$$$| $$$$$$/       | $$  $$$| $$| $$$$$$$$        | $$    | $$      | $$\ $$$$
+ *    | $$  | $$ /$$__  $$| $$| $$| $$  | $$| $$      | $$_____/ /$$__  $$| $$_  $$       | $$\  $ | $$| $$_____/        | $$    | $$      | $$ \ $$$
+ *    |  $$$$$$/|  $$$$$$$| $$| $$| $$$$$$$/| $$      |  $$$$$$$|  $$$$$$$| $$ \  $$      | $$ \/  | $$|  $$$$$$$       /$$$$$$ /$$$$$$ /$$|  $$$$$$/
+ *     \______/  \_______/|__/|__/|_______/ |__/       \_______/ \_______/|__/  \__/      |__/     |__/ \_______/      |______/|______/|__/ \______/ 
+ *                                                                                                                                                   
+ *    UI Design by Sem Voigtländer                                                                                                                                               
+ *                                                                                                                                                   
+ */
+
+/* Global */
+* {
+	font-family: monospace, Arial, sans-serif;
+	font-size: 36px;
+}
+
+ /* View */
+ body, html {
+ 	background: #D1913C;  /* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #FFD194, #D1913C);  /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #FFD194, #D1913C); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+ 	margin: 0;
+ 	padding: 0;
+ 	font-size: 16px;
+ }
+
+header {
+	text-align: center;
+	font-size: 42px;
+	font-weight: bold;
+}
+
+main {
+	width: 100%;
+	text-align: center;
+	padding-top: 25%;
+}
+
+.go, .go * {
+	text-align: center;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 15px !important;
+}
+
+footer {
+	padding-top: 25%;
+	text-align: center;
+}
+
