@@ -17,7 +17,7 @@ Created by Sem Voigtländer
 This uses Ian Beer's empty_list as a payload.
 You can read about this exploit here: https://github.com/MTJailed/jailbreakme/blob/master/DOCS/Emptylist-11.3.1-Writeup.md
 
-#### 9.3 - 9.3.x: All devices
+#### 9.3 - 9.3.x: All devices (Thanks to Luca Todesco)
 This uses Pangu NvWaStone as a payload and has been written by Luca Todesco (@qwertyoruiopz).
 
 Nvwastone slides by Pangu: https://www.blackhat.com/docs/us-16/materials/us-16-Wang-Pangu-9-Internals.pdf
@@ -36,7 +36,10 @@ This will use the work of Tihmstar and use EtaSon?? as a payload.
 
 #### 9.1 - 9.3.4: All devices (Thanks to Tihmstar)
 This uses HomeDepot as a payload. The webkit exploit has been written by Tihmstar.
+
 Vulnerabilites used in this jailbreak also go under the name Pegasus.
+
+Homedepot on the iPhone wiki: https://www.theiphonewiki.com/wiki/Home_Depot
 
 #### 8.4.1: (soon)
 This will use the work of Tihmstar and use EtaSon?? as a payload.
