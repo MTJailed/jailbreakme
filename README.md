@@ -1,4 +1,4 @@
-# jailbreak me
+# Jailbreak Me 13.37
 A webbased jailbreak solution unifying existing jailbreak me solutions and new ones.
 
 Created by Sem Voigtländer
