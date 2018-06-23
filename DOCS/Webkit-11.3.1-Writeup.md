@@ -17,16 +17,16 @@ Therefore the following methods can be used for finding offsets for the exploit 
 The first option would be more straightforward as it only gives you the libraries you need but at this time my program as I wrote it is only able to dump the TEXT section from the libraries. You can find the code in UnjailMe.
 
 The second option is what I did but that comes with a limitation:
-- There are currently no working and precise cache extraction utillities that do not truncate or corrupt the libraries.
-- Loading an entire cache (1GB) into IDA will be extremely slow
-- Radare2 will load it but the analysis will take ages and its not efficient to analyze the entire cache
-- Hopper will load it and you can select the library to analyze but hopper does not have very good ROP gadget search functionality other than poorly searching for opcodes.
-
-So finding the symbol offsets is easy with hopper.
+- ~~There are currently no working and precise cache extraction utillities that do not truncate or corrupt the libraries.~~
+- Loading an entire cache (1GB) into IDA will be extremely slow so it needs to be extracted.
+- Radare2 can be used to find the ROP gadgets
+- My offset finder can find the offsets of the needed symbols on-device, otherwise hopper can be used.
 
 Take a look at offsets.module.js and there you can see which offsets to find.
 
-But then there are the ROP gadgets and those may take ages to find manually in Hopper.
 
-Until either a new cache extraction utilty is written or my iOS app for dumping libraries is finished looking for ROP gadgets will be a painful job.
+To find the popx8 gadget in ModelIO use the followin in radare2:
+```radare2
+	"/c ldr x8, [sp, 0x28]; ldr x0, [x8, 0x18]; ldp x29, x30, [sp, 0x50]; add sp, sp, 0x60; ret"
+```
 
