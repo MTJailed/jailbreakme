@@ -1,5 +1,5 @@
 # A kernel exploit for iOS up to 11.3.1
-## By Ian Beer
+## By Ian Beer (Writeup modified by Sem Voigtländer)
 
 
 ### The Bug
