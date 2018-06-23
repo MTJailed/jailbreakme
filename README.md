@@ -20,6 +20,12 @@ You can read about this exploit here: https://github.com/MTJailed/jailbreakme/bl
 #### 9.3 - 9.3.x: All devices
 This uses Pangu NvWaStone as a payload and has been written by Luca Todesco (@qwertyoruiopz).
 
+Nvwastone slides by Pangu: https://www.blackhat.com/docs/us-16/materials/us-16-Wang-Pangu-9-Internals.pdf
+
+Extended writeup about nvwastone by Jonathan Levin: http://newosxbook.com/articles/nuwashi.pdf
+
+Simple writeup about nvwastone by Nettitude Labs: https://labs.nettitude.com/blog/what-is-the-jailbreak-for-ios-9-3-3-actually-doing-part-1/
+
 #### 8.4.1 (soon)
 This will use the work of Tihmstar and use EtaSon?? as a payload.
 
@@ -36,6 +42,9 @@ Vulnerabilites used in this jailbreak also go under the name Pegasus.
 This will use the work of Tihmstar and use EtaSon?? as a payload.
 
 ### 32-bit ancient devices (Thanks to Comex)
+
+How to compile: https://mirrors.sipsik.net/domonkos.tomcsanyi.net/index.html%3Fp=329.html
+
 #### 4.3.3: iPad 1, iPad 2, iPhone 3GS, iPhone 4 GSM, iPod 3rd gen, iPod 4th gen
 
 #### 4.3.2: iPad 1, iPhone 3GS, iPhone 4 GSM, iPod 3rd gen, iPod 4th gen
