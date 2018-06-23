@@ -12,6 +12,9 @@ Created by Sem Voigtländer
 
 ## Support
 
+- 8.4.1 & 9.3 up to 9.3.3 & 11.3.1 (64-bit)
+- 4.2.6 up to 4.3.3 & 8.4.1 and 9.1 up to 9.3.4 (32-bit)
+
 ### 64-bit devices
 #### 11.3.1: iPhone 8, 8+, X (more to come)
 This uses Ian Beer's empty_list as a payload.
