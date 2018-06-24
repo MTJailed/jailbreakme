@@ -1,4 +1,8 @@
-//Fuck off Joseph Shenton and other copycats (Except for coolstar and luca todesco, they are free to copy).
+/*
+    To find ModelIO popx8:
+    Use radare: "/c ldr x8, [sp, 0x28]; ldr x0, [x8, 0x18]; ldp x29, x30, [sp, 0x50]; add sp, sp, 0x60; ret"
+*/
+
 var Offsets = function Offsets(sw_vers, productname) {
     
     var offsets = [];
@@ -21,104 +25,138 @@ var Offsets = function Offsets(sw_vers, productname) {
     offsets["iPhone 8+"] = [];
     offsets["iPhone X"] = [];
     
-    offsets["iPhone 6S"][11.31] = {
-        padding: 0x18, //For JIT Hardening
-        vtable: 0, //From JSCore
-        disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b3247d28, //From JSCore (might be incorrect)
-        g_gigacagebaseptrs: 0x1b1bf4000, //From JSCore
-        g_typedarraypoisons: 0x1b31a1720, //From JSCore
-        longjmp: 0x180b126e8, //From JSCore (might be incorrect)
-        dlsym: 0x18851d090,  //From JSCore
-        startfixedmempool: 0x1b31a10b8, //From JSCore
-        endfixedmempool: 0x1b31a10c0, //From JSCore
-        jit_writeseperateheaps_func: 0x1b31a10c8, //From JSCore
-        usefastpermissions_jitcopy: 0x1b1bf0018, //From JSCore (JIT hardening)
-        ptr_stack_check_guard: 0x1ac2f7c40, //From JSCore
-        modelio_popx8: 0x18d2f6574, //From ModelIO
-                                    //   ldr x8, [sp, #0x28]
-                                    //   ldr x0, [x8, #0x18]
-                                    //   ldp x29, x30, [sp, #0x50]
-                                    //   add sp, sp, #0x60
-                                    //   ret
-        coreaudio_popx2: 0x18409ddcc,   //From CoreAudio
-                                        //   ldr x2, [sp, #8]
-                                        //   mov x0, x2
-                                        //   ldp x29, x30, [sp, #0x10]
-                                        //   add sp, sp, #0x20
-                                        //   ret
-        linkcode_gadget: 0  //See jitcode.s (stage 2)
-    };
-    
-    
+    //iPhone 6+
     offsets["iPhone 6+"][11.31] = {
-        padding: 0x18, //For JIT Hardening
-        vtable: 0, //From JSCore
+        padding: 0x18,
+        vtable: 0,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b3247d28, //From JSCore (might be incorrect)
-        g_gigacagebaseptrs: 0x1b1bf4000, //From JSCore
-        g_typedarraypoisons: 0x1b31a1720, //From JSCore
-        longjmp: 0x180b12778, //From JSCore (might be incorrect)
-        dlsym: 0x18084ef90,  //From JSCore
-        startfixedmempool: 0x1b31a10b8, //From JSCore
-        endfixedmempool: 0x1b31a10c0, //From JSCore
-        jit_writeseperateheaps_func: 0x1b31a10c8, //From JSCore
-        usefastpermissions_jitcopy: 0x1b1bf0018, //From JSCore (JIT hardening)
-        ptr_stack_check_guard: 0x1b30f9ef8, //From JSCore
-        modelio_popx8: 0, //From ModelIO
-                                    //   ldr x8, [sp, #0x28]
-                                    //   ldr x0, [x8, #0x18]
-                                    //   ldp x29, x30, [sp, #0x50]
-                                    //   add sp, sp, #0x60
-                                    //   ret
-        coreaudio_popx2: 0,   //From CoreAudio
-                                        //   ldr x2, [sp, #8]
-                                        //   mov x0, x2
-                                        //   ldp x29, x30, [sp, #0x10]
-                                        //   add sp, sp, #0x20
-                                        //   ret
-        linkcode_gadget: 0  //See jitcode.s (stage 2)
+        callbacks: 0,
+        g_gigacagebaseptrs: 0x1b1bf4000,
+        g_typedarraypoisons: 0x1b31a1720,
+        longjmp: 0x180b12778,
+        dlsym: 0x18084ef90,
+        startfixedmempool: 0x1b31a10b8,
+        endfixedmempool: 0x1b31a10c0,
+        jit_writeseperateheaps_func: 0x1b31a10c8,
+        usefastpermissions_jitcopy: 0x1b1bf0018,
+        ptr_stack_check_guard: 0x1b30f9ef8,
+        modelio_popx8: 0,
+        coreaudio_popx2: 0,
+        linkcode_gadget: 0
     };
     
+    //iPhone 6S
+    offsets["iPhone 6S"][11.31] = {
+        padding: 0x18,
+        vtable: 0,
+        disableprimitivegigacage: 0x18851a7d4,
+        callbacks: 0x1b3247d28,
+        g_gigacagebaseptrs: 0x1b1bf4000,
+        g_typedarraypoisons: 0x1b31a1720,
+        longjmp: 0x180b126e8,
+        dlsym: 0x18851d090,
+        startfixedmempool: 0x1b31a10b8,
+        endfixedmempool: 0x1b31a10c0,
+        jit_writeseperateheaps_func: 0x1b31a10c8,
+        usefastpermissions_jitcopy: 0x1b1bf0018,
+        ptr_stack_check_guard: 0x1b30f9ef8,
+        modelio_popx8: 0x18d2f6574,
+        coreaudio_popx2: 0x18409ddcc,
+        linkcode_gadget: 0
+    };
+    
+    //iPhone 6S+
+    offsets["iPhone 6S+"][11.31] = offsets["iPhone 6S"][11.31];
+    
+    //iPhone 7+
+    offsets["iPhone 7+"][11.31] = {
+        padding: 0x18,
+        vtable: 0,
+        disableprimitivegigacage: 0x18851a7d4,
+        g_gigacagebaseptrs: 0x1b1d08000,
+        g_typedarraypoisons: 0x1b335d720,
+        dlsym: 0x18084ef90, //may be incorrect
+        startfixedmempool: 0x1b335d0b8,
+        endfixedmempool: 0x1b335d0c0,
+        jit_writeseperateheaps_func: 0x1b335d0c8,
+        usefastpermissions_jitcopy: 0x1b1d04018,
+        ptr_stack_check_guard: 0x1b32b7ef8,
+        dlsym: 0x18084ef90,
+        longjmp: 0x180b12778,
+        callbacks: 0x1b335d698,
+        modelio_popx8: 0, 
+        coreaudio_popx2: 0,
+        linkcode_gadget: 0
+    };
+    
+    //iPhone 8
     offsets["iPhone 8"][11.31] = {
-        padding: 0x20, //For JIT Hardening
-        vtable: 0x189c9a808, //From Webkit
+        padding: 0x20,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b335bd28, //From Webkit
-        g_gigacagebaseptrs: 0x1b1d08000, //From Webkit
-        g_typedarraypoisons: 0x1b335d720, //From Webkit
-        longjmp: 0x180b126e8, //From CoreFoundation
-        dlsym: 0x18084ef90,  //From CoreFoundation
-        startfixedmempool: 0x1b335d0b8, //From Webkit
-        endfixedmempool: 0x1b335d0c0, //From Webkit
-        jit_writeseperateheaps_func: 0x1b335d0c8, //From Webkit
-        usefastpermissions_jitcopy: 0x1b1d04018, //From Webkit (JIT hardening)
-        ptr_stack_check_guard: 0x1ac3efc40, //From Webkit
-        modelio_popx8: 0x18d2f6564, //Use radare: "/c ldr x8, [sp, 0x28]; ldr x0, [x8, 0x18]; ldp x29, x30, [sp, 0x50]; add sp, sp, 0x60; ret"
-        coreaudio_popx2: 0x18409ddbc,   //From CoreAudio
-                                        //   ldr x2, [sp, #8]
-                                        //   mov x0, x2
-                                        //   ldp x29, x30, [sp, #0x10]
-                                        //   add sp, sp, #0x20
-                                        //   ret
-        linkcode_gadget: 0x187bd18c8 //See jitcode.s (stage 2)
+        callbacks: 0x1b335bd28,
+        g_gigacagebaseptrs: 0x1b1d08000,
+        g_typedarraypoisons: 0x1b335d720,
+        longjmp: 0x180b126e8,
+        dlsym: 0x18084ef90,
+        startfixedmempool: 0x1b335d0b8,
+        endfixedmempool: 0x1b335d0c0,
+        jit_writeseperateheaps_func: 0x1b335d0c8,
+        usefastpermissions_jitcopy: 0x1b1d04018,
+        ptr_stack_check_guard: 0x1ac3efc40,
+        modelio_popx8: 0x18d2f6564,
+        coreaudio_popx2: 0x18409ddbc,
+        linkcode_gadget: 0x187bd18c8
     };
     
-    offsets["iPhone X"][11.31] = { //soon
-        padding: 0x20, //For JIT Hardening
-        vtable: 0, //From Webkit
+    //iPhone 8+
+    offsets["iPhone 8+"][11.31] = {
+        padding: 0x20,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        g_gigacagebaseptrs: 0x1b1cb0000, //From Webkit
-        g_typedarraypoisons: 0x1b3281720, //From Webkit
-        startfixedmempool: 0x1b32810b8, //From Webkit
-        endfixedmempool: 0x1b32810c0, //From Webkit
+        callbacks: 0x1b335d698,
+        g_gigacagebaseptrs: 0x1b1d08000,
+        g_typedarraypoisons: 0x1b335d720,
+        longjmp: 0x180b1278,
+        dlsym: 0x18084ef90,
+        startfixedmempool: 0x1b335d0b8,
+        endfixedmempool: 0x1b335d0c0,
+        jit_writeseperateheaps_func: 0x1b335d0c8,
+        usefastpermissions_jitcopy: 0x1b1d04018,
+        ptr_stack_check_guard: 0x1b32b7ef8,
+        
+        //Asuming these are correct, just copied from the i8
+        modelio_popx8: 0x18d2f6564,
+        coreaudio_popx2: 0x18409ddbc,
+        linkcode_gadget: 0x187bd18c8
     };
     
+    //iPhone X
+    offsets["iPhone X"][11.31] = {
+        padding: 0x20,
+        disableprimitivegigacage: 0x18851a7d4,
+        g_gigacagebaseptrs: 0x1b1cb0000,
+        g_typedarraypoisons: 0x1b3281720,
+        startfixedmempool: 0x1b32810b8,
+        endfixedmempool: 0x1b32810c0,
+        jit_writeseperateheaps_func: 0x1b32810c8,
+        usefastpermissions_jitcopy: 0x1b1cac018,
+        ptr_stack_check_guard: 0x1b31dcef8,
+        dlsym: 0x18084ef90,
+        longjmp: 0x180b12778,
+        callbacks: 0x1b3281698,
+        modelio_popx8: 0,
+        coreaudio_popx2: 0,
+        linkcode_gadget: 0,
+        vtable: 0
+    };
+    
+    //fixing up offsets that are the same accross devices, without having to allocate more memory for them.
     offsets["iPhone 8"][11.3] = offsets["iPhone 8"][11.31];
-    offsets["iPhone 8+"][11.3] = offsets["iPhone 8"][11.31];
-    //offsets["iPhone X"][11.3] = offsets["iPhone 8"][11.31];
-    offsets["iPhone 8+"][11.31] = offsets["iPhone 8"][11.31];
-    //offsets["iPhone X"][11.31] = offsets["iPhone 8"][11.31];
+    offsets["iPhone 8+"][11.3] = offsets["iPhone 8+"][11.31];
+    offsets["iPhone X"][11.3] = offsets["iPhone X"][11.31];
+    offsets["iPhone 6S"][11.3] = offsets["iPhone 6S"][11.31];
+    offsets["iPhone 6S+"][11.3] = offsets["iPhone 6S"][11.31];
     
     if(offsets[productname] !== undefined) {
         if(offsets[productname][sw_vers] !== undefined) {
