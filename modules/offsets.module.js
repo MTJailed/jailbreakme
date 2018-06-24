@@ -41,7 +41,7 @@ var Offsets = function Offsets(sw_vers, productname) {
                                     //   ldp x29, x30, [sp, #0x50]
                                     //   add sp, sp, #0x60
                                     //   ret
-        coreaudio_popx2: 0,   //From CoreAudio
+        coreaudio_popx2: 0x18409ddcc,   //From CoreAudio
                                         //   ldr x2, [sp, #8]
                                         //   mov x0, x2
                                         //   ldp x29, x30, [sp, #0x10]
