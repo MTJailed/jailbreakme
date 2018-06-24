@@ -74,6 +74,16 @@ var Offsets = function Offsets(sw_vers, productname) {
         linkcode_gadget: 0x187bd18c8 //See jitcode.s (stage 2)
     };
     
+    offsets["iPhone X"][11.31] = { //soon
+        padding: 0x20, //For JIT Hardening
+        vtable: 0, //From Webkit
+        disableprimitivegigacage: 0x18851a7d4,
+        g_gigacagebaseptrs: 0x1b1cb0000, //From Webkit
+        g_typedarraypoisons: 0x1b3281720, //From Webkit
+        startfixedmempool: 0x1b32810b8, //From Webkit
+        endfixedmempool: 0x1b32810c0, //From Webkit
+    };
+    
     offsets["iPhone 8"][11.3] = offsets["iPhone 8"][11.31];
     offsets["iPhone 8+"][11.3] = offsets["iPhone 8"][11.31];
     //offsets["iPhone X"][11.3] = offsets["iPhone 8"][11.31];
