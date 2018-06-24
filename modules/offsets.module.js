@@ -30,7 +30,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         padding: 0x18,
         vtable: 0,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0,
+        callbacks: 0x1b31a1698,
         g_gigacagebaseptrs: 0x1b1bf4000,
         g_typedarraypoisons: 0x1b31a1720,
         longjmp: 0x180b12778,
@@ -95,7 +95,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
         g_typedarraypoisons: 0x1b335d720,
-        dlsym: 0x18084ef90, //may be incorrect
+        dlsym: 0x18084ef90,
         startfixedmempool: 0x1b335d0b8,
         endfixedmempool: 0x1b335d0c0,
         jit_writeseperateheaps_func: 0x1b335d0c8,

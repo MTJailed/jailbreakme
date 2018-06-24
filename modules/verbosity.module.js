@@ -1,7 +1,7 @@
-var VERBOSITY_LOW = 0;
-var VERBOSITY_DEFAULT = 1;
-var VERBOSITY_HIGH = 2;
-var VERBOSITY_VERBOSE = 3;
-window.vebosity = VERBOSITY_DEFAULT;
-print = alert;
+VERBOSITY_LOW = 0;
+VERBOSITY_DEFAULT = 1;
+VERBOSITY_HIGH = 2;
+VERBOSITY_VERBOSE = 3;
+verbosity = VERBOSITY_VERBOSE;
+print = function(arg){alert(arg);puts(arg);};
 

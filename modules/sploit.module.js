@@ -27,6 +27,7 @@
  */
 module('offsets');
 module('devicesupport');
+module('verbosity');
 
 function printspecs() {
     var device = window.chosendevice;
@@ -44,8 +45,8 @@ function sploit_init() {
     
     var supported_browser = device.is_mobile && device.is_safari;
     var supported_type = device.devicetype == "iPhone"  || device.devicetype == "iPad";
-    var supported_vers = device.sw_vers > MAX_SUPPORT.os || parseInt(device.safari_vers) > MAX_SUPPORT.safari;
-/*
+    var supported_vers = device.sw_vers <= MAX_SUPPORT.os || parseInt(device.safari_vers) <= MAX_SUPPORT.safari;
+
     if(!supported_browser) {
         puts("Failed. This exploit only works on MobileSafari.");
         return false;
@@ -77,7 +78,7 @@ function sploit_init() {
         alert('Chose offsets: '+JSON.stringify(window.chosendevice.offsets));
     } else {
         window.chosendevice.offsets = {}; //not needed
-    }*/
+    }
     return true;
 }
 
@@ -98,13 +99,14 @@ function strategy_select() {
         puts("Chose to use Tihmstars jailbreak me");
         include('sploit.91x32');
         start_strategy("wk91go");
+        return true;
     }
 
     else if(window.chosendevice.sw_vers === 11.3 || window.chosendevice.sw_vers === 11.31) {
         puts("Chose to use Niklas B's jailbreak me.");
 
         var supported_devices = ["iPhone 8", "iPhone 8+", "iPhone 6S"];
-        var supported = false;
+        var supported = null;
 
         for(device = 0; device < supported_devices.length; device++) {
             if(window.chosendevice.productname.indexOf(supported_devices[device]) > -1) {
@@ -116,6 +118,7 @@ function strategy_select() {
         if(supported) {
             include('sploit.1131');
             start_strategy("wk113go");
+            return true;
     
         } else {
             puts('Your '+(window.chosendevice.productname ? window.chosendevice.productname.join(' or ') : 'Unknown')+ " is not supported");
@@ -137,9 +140,7 @@ function sploit_main() {
     var strategy = strategy_select();
 
     try{ 
-        if(strategy) {
-            strategy();
-        } else {
+        if(!strategy) {
             puts("Your device or ios version isn't supported.");
             return false;
         }

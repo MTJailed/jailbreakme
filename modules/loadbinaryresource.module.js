@@ -1,3 +1,4 @@
+module('verbosity');
 function load_binary_resource(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);
