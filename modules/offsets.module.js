@@ -25,7 +25,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     offsets["iPhone 8+"] = [];
     offsets["iPhone X"] = [];
     
-     //iPhone 6
+    //iPhone 6
     offsets["iPhone 6"][11.31] = {
         padding: 0x18,
         vtable: 0,
@@ -68,7 +68,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     //iPhone 6S
     offsets["iPhone 6S"][11.31] = {
         padding: 0x18,
-        vtable: 0,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b3247d28,
         g_gigacagebaseptrs: 0x1b1bf4000,
