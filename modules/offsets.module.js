@@ -135,7 +135,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     //iPhone 7
     offsets["iPhone 7"][11.31] = {
         padding: 0x18,
-        vtable: 0,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
         g_typedarraypoisons: 0x1b335d720,
@@ -156,7 +156,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     //iPhone 7+
     offsets["iPhone 7+"][11.31] = {
         padding: 0x18,
-        vtable: 0,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
         g_typedarraypoisons: 0x1b335d720,
