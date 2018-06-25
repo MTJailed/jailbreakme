@@ -25,10 +25,30 @@ var Offsets = function Offsets(sw_vers, productname) {
     offsets["iPhone 8+"] = [];
     offsets["iPhone X"] = [];
     
+    //iPhone 5S
+    offsets["iPhone 5S"][11.31] = {
+        padding: 0x18,
+        vtable: 0x189c9a808,
+        disableprimitivegigacage: 0x18851a7d4,
+        callbacks: 0x1b3199698,
+        g_gigacagebaseptrs: 0x1b1bec000,
+        g_typedarraypoisons: 0x1b3199720,
+        longjmp: 0x180b12778,
+        dlsym: 0x18084ef90,
+        startfixedmempool: 0x1b31990b8,
+        endfixedmempool: 0x1b31990c0,
+        jit_writeseperateheaps_func: 0x1b31990c8,
+        usefastpermissions_jitcopy: 0x1b1be8018,
+        ptr_stack_check_guard: 0x1b30f1ef8,
+        modelio_popx8: 0,
+        coreaudio_popx2: 0,
+        linkcode_gadget: 0
+    };
+
     //iPhone 6
     offsets["iPhone 6"][11.31] = {
         padding: 0x18,
-        vtable: 0,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b31a1698,
         g_gigacagebaseptrs: 0x1b1bf4000,
@@ -48,7 +68,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     //iPhone 6+
     offsets["iPhone 6+"][11.31] = {
         padding: 0x18,
-        vtable: 0,
+        vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0,
         g_gigacagebaseptrs: 0x1b1bf4000,
@@ -172,7 +192,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     };
     
     //fixing up offsets that are the same accross devices, without having to allocate more memory for them.
-    
+    offsets["iPhone 5S"][11.3] = offsets["iPhone 5S"][11.31];
     offsets["iPhone 6"][11.3] = offsets["iPhone 6"][11.31];
     offsets["iPhone 6+"][11.3] = offsets["iPhone 6+"][11.31];
     offsets["iPhone 6S"][11.3] = offsets["iPhone 6S"][11.31];
