@@ -95,7 +95,14 @@ function start_strategy(name) {
 function strategy_select() {
     if(!window.chosendevice) return false;
 
-    if(window.chosendevice.sw_vers >= 9.0 && window.chosendevice.sw_vers < 9.35) {
+    if(window.chosendevice.sw_vers >= 7.1 && window.chosendevice.sw_vers <= 7.12) {
+        puts("Chose CG Gangster for 7.1 - 7.1.2");
+        include('sploit.71');
+        start_strategy('cg7go');
+        return true;
+    }
+
+    else if(window.chosendevice.sw_vers >= 9.0 && window.chosendevice.sw_vers < 9.35) {
         puts("Chose to use Tihmstars jailbreak me");
         include('sploit.91x32');
         start_strategy("wk91go");
