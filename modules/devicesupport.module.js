@@ -42,6 +42,10 @@ function GetGPU() {
     var gl = document.getElementById('glcanvas').getContext('experimental-webgl');
     var renderinfo = null;
     try{
+        if(!gl.getExtension) {
+            GPU = false;
+            return false;
+        }
         renderinfo = gl.getExtension("WEBGL_debug_renderer_info");
         if(renderinfo) GPU = gl.getParameter(renderinfo.UNMASKED_RENDERER_WEBGL);
         document.getElementById('glcanvas').remove();

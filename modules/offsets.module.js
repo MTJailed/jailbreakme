@@ -102,7 +102,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         ptr_stack_check_guard: 0x1b30f9ef8,
         modelio_popx8: 0x18d2f6574,
         coreaudio_popx2: 0x18409ddcc,
-        linkcode_gadget: 0
+        linkcode_gadget: 0x187bd12c0
     };
     
     //iPhone 6S+

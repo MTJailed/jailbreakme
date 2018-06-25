@@ -95,7 +95,13 @@ function start_strategy(name) {
 function strategy_select() {
     if(!window.chosendevice) return false;
 
-    if(window.chosendevice.sw_vers >= 7.1 && window.chosendevice.sw_vers <= 7.12) {
+    if(window.chosendevice.sw_vers >= 3.12 && window.chosendevice.sw_vers <= 4.01) {
+        include('sploit.ancient');
+        start_strategy('ancientgo');
+        return true;
+    }
+
+    else if(window.chosendevice.sw_vers >= 7.1 && window.chosendevice.sw_vers <= 7.12) {
         puts("Chose CG Gangster for 7.1 - 7.1.2");
         include('sploit.71');
         start_strategy('cg7go');
