@@ -224,6 +224,8 @@ var Offsets = function Offsets(sw_vers, productname) {
     offsets["iPhone 8+"][11.3] = offsets["iPhone 8+"][11.31];
     offsets["iPhone X"][11.3] = offsets["iPhone X"][11.31];
     
+    offsets["iPad Air"][11.3] = offsets["iPad Air"][11.31];
+    
     if(offsets[productname] !== undefined) {
         if(offsets[productname][sw_vers] !== undefined) {
             return offsets[productname][sw_vers];
