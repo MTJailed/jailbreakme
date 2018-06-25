@@ -105,8 +105,8 @@ function strategy_select() {
     else if(window.chosendevice.sw_vers === 11.3 || window.chosendevice.sw_vers === 11.31) {
         puts("Chose to use Niklas B's jailbreak me.");
 
-        var supported_devices = ["iPhone 8", "iPhone 8+", "iPhone 6S"];
-        var supported = null;
+        var supported_devices = ["iPhone 8", "iPhone 8+", "iPhone 6S", "iPhone 5S"];
+        var supported = false;
 
         for(device = 0; device < supported_devices.length; device++) {
             if(window.chosendevice.productname.indexOf(supported_devices[device]) > -1) {
@@ -150,14 +150,3 @@ function sploit_main() {
     return true;
 }
 
-/***
- *     █████╗    ██████╗    ██╗  ██╗     ██████╗ ██╗  ██╗      ██████╗ ██╗████████╗
- *    ██╔══██╗   ╚════██╗   ╚██╗██╔╝    ██╔════╝ ██║  ██║      ██╔══██╗██║╚══██╔══╝
- *    ╚██████║    █████╔╝    ╚███╔╝     ███████╗ ███████║█████╗██████╔╝██║   ██║
- *     ╚═══██║    ╚═══██╗    ██╔██╗     ██╔═══██╗╚════██║╚════╝██╔══██╗██║   ██║
- *     █████╔╝██╗██████╔╝██╗██╔╝ ██╗    ╚██████╔╝     ██║      ██████╔╝██║   ██║
- *     ╚════╝ ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝     ╚═════╝      ╚═╝      ╚═════╝ ╚═╝   ╚═╝
- *      By Luca Todesco
- */
-
-// ETA S0n
