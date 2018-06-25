@@ -7,6 +7,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     var offsets = [];
     
+    //iPhones
     offsets["iPhone 2G"] = [];
     offsets["iPhone 3G"] = [];
     offsets["iPhone 3GS"] = [];
@@ -25,6 +26,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     offsets["iPhone 8+"] = [];
     offsets["iPhone X"] = [];
     
+    //iPads
     offsets["iPad Air"] = [];
     
     //iPad Air
