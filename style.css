@@ -20,15 +20,28 @@
 
  /* View */
  body, html {
- 	background: #D1913C;  /* fallback for old browsers */
-	background: -webkit-linear-gradient(to right, #FFD194, #D1913C);  /* Chrome 10-25, Safari 5.1-6 */
-	background: linear-gradient(to right, #FFD194, #D1913C); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+ 	background: #FFFFFF;
+ 	background: url('assets/wallpaper.jpg');
+ 	background-size: cover;
+ 	background-position: center;
+ 	background-repeat: no-repeat;
  	margin: 0;
  	padding: 0;
  	font-size: 16px;
+ 	width: 100%;
+ 	height: 100%;
+ 	color: white;
  }
 
+
+body {
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
 header {
+	padding-top: 25px;
 	text-align: center;
 	font-size: 42px;
 	font-weight: bold;
@@ -40,11 +53,24 @@ main {
 	padding-top: 25%;
 }
 
+.go {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	min-width: 50px;
+	max-width: 90%;
+}
 .go, .go * {
 	text-align: center;
 	text-decoration: none;
 	font-weight: bold;
 	font-size: 15px !important;
+	border-radius: 7px;
+	background: rgba(252, 252, 252, 0.7);
+	color: purple;
+	
+	display: inline-block;
+	box-decoration-break: slice;
+
 }
 
 footer {
