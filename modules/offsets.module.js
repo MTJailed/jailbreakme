@@ -44,9 +44,9 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b2b990c8,
         usefastpermissions_jitcopy: 0x1b1620018,
         ptr_stack_check_guard: 0x1b2af3ef8,
-        modelio_popx8: 0,
-        coreaudio_popx2: 0,
-        linkcode_gadget: 0
+        modelio_popx8: 0x18D2F6574,
+        coreaudio_popx2: 0x18409DDCC,
+        linkcode_gadget: 0x187BD12C0
     };
     
     //iPhone 5S
