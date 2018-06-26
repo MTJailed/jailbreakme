@@ -13,7 +13,7 @@ Created by Sem Voigtländer
 ## Support
 
 - 8.4.1 & 9.3 up to 9.3.3 & 11.3.1 (64-bit)
-- 4.2.6 up to 4.3.3 & 8.4.1 and 9.1 up to 9.3.4 (32-bit)
+- 3.1.2 up to 4.0.1 & 8.4.1 and 9.1 up to 9.3.4 (32-bit)
 
 ### 64-bit devices
 #### 11.3.1: iPhone 8, 8+, X (more to come)
@@ -46,6 +46,21 @@ Homedepot on the iPhone wiki: https://www.theiphonewiki.com/wiki/Home_Depot
 
 #### 8.4.1: (soon)
 This will use the work of Tihmstar and use EtaSon?? as a payload.
+
+#### 7.1 - 7.1.2: (Soon)
+Neat vulnerability in CoreGraphics at the time can gain arbitrary code execution.
+
+Might need manual patching of the dyld_shared_cache for newer devices.
+
+At this time the exploit is just a demo of gaining code execution, any contributions are welcome.
+
+Will use the evasi0n jailbreak.
+
+Talk about evasi0n at 34C3 by Arg: https://mirror.netcologne.de/CCC//congress/2017/h264-hd/34c3-8720-eng-iOS_kernel_exploitation_archaeology.mp4
+
+Writeup: http://www.binamuse.com/papers/CoreGraphicsInformationLeakReport.pdf
+
+Poc: https://github.com/feliam/CVE-2014-4378 by @feliam
 
 ### 32-bit ancient devices (Thanks to Comex)
 
