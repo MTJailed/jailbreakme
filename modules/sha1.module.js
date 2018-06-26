@@ -1,3 +1,5 @@
+// WRITTEN BY CHRIS VENESS
+
 var Sha1 = {};  // Sha1 namespace
 
 /**
