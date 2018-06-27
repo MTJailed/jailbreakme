@@ -31,7 +31,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPad Air
     offsets["iPad Air"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b2b99698,
@@ -51,7 +51,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 5S
     offsets["iPhone 5S"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b3199698,
@@ -71,7 +71,7 @@ var Offsets = function Offsets(sw_vers, productname) {
 
     //iPhone 6
     offsets["iPhone 6"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b31a1698,
@@ -93,7 +93,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     // Note: No need for gigacage related offsets for this device.
     // These work on my device.
     offsets["iPhone 6+"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0,
         callbacks: 0x1b319fd28,
@@ -115,7 +115,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     // Note: No need for gigacage related offsets for this device, but added them anyway.
     // TODO: Test offsets.
     offsets["iPhone 6S"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b319fd28,
@@ -138,7 +138,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 7
     offsets["iPhone 7"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
@@ -159,7 +159,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 7+
     offsets["iPhone 7+"][11.31] = {
-        padding: 0x18,
+        padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
