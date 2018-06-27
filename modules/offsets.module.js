@@ -89,36 +89,40 @@ var Offsets = function Offsets(sw_vers, productname) {
         linkcode_gadget: 0
     };
     
-    //iPhone 6+
+     //iPhone 6+
+    // Note: No need for gigacage related offsets for this device.
+    // These work on my device.
     offsets["iPhone 6+"][11.31] = {
         padding: 0x18,
         vtable: 0x189c9a808,
-        disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0,
-        g_gigacagebaseptrs: 0x1b1bf4000,
+        disableprimitivegigacage: 0,
+        callbacks: 0x1b319fd28,
+        g_gigacagebaseptrs: 0,
         g_typedarraypoisons: 0x1b31a1720,
-        longjmp: 0x180b12778,
+        longjmp: 0x180b126e8,
         dlsym: 0x18084ef90,
         startfixedmempool: 0x1b31a10b8,
         endfixedmempool: 0x1b31a10c0,
         jit_writeseperateheaps_func: 0x1b31a10c8,
         usefastpermissions_jitcopy: 0x1b1bf0018,
-        ptr_stack_check_guard: 0x1b30f9ef8,
-        modelio_popx8: 0,
-        coreaudio_popx2: 0,
-        linkcode_gadget: 0
+        ptr_stack_check_guard: 0x1ac2f7c40,
+        modelio_popx8: 0x18d2f6564,
+        coreaudio_popx2: 0x18409ddbc,
+        linkcode_gadget: 0x187bd187c
     };
     
     //iPhone 6S
+    // Note: No need for gigacage related offsets for this device, but added them anyway.
+    // TODO: Test offsets.
     offsets["iPhone 6S"][11.31] = {
         padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b3247d28,
+        callbacks: 0x1b319fd28,
         g_gigacagebaseptrs: 0x1b1bf4000,
         g_typedarraypoisons: 0x1b31a1720,
         longjmp: 0x180b126e8,
-        dlsym: 0x18851d090,
+        dlsym: 0x18084ef90,
         startfixedmempool: 0x1b31a10b8,
         endfixedmempool: 0x1b31a10c0,
         jit_writeseperateheaps_func: 0x1b31a10c8,
