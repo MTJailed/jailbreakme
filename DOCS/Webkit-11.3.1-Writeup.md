@@ -23,7 +23,7 @@ The second option is what I did but that comes with a limitation:
 - My offset finder can find the offsets of the needed symbols on-device, otherwise hopper can be used.
 
 Take a look at offsets.module.js and there you can see which offsets to find.
-
+You can find my offset finder on this repository under releases.
 
 To find the popx8 gadget in ModelIO use the followin in radare2:
 ```radare2
