@@ -121,7 +121,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         callbacks: 0x1b319fd28,
         g_gigacagebaseptrs: 0x1b1bf4000,
         g_typedarraypoisons: 0x1b31a1720,
-        longjmp: 0x180b126e8,
+        longjmp: 0x180b12778,
         dlsym: 0x18084ef90,
         startfixedmempool: 0x1b31a10b8,
         endfixedmempool: 0x1b31a10c0,

