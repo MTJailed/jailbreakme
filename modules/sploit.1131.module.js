@@ -10,12 +10,19 @@
  */
 
 using('verbosity');
+
+var UNITY = {
+    TEN: 10,
+    HUNDRED: 100,
+    THOUSAND: 1000,
+    MILLION: 1000000,
+    BILLION: 1000000000
+};
+
 _off = {};
-TEN = 10;
-HUNDRED = 100;
-THOUSAND = 1000;
-ITERS = TEN*THOUSAND;
-ALLOCS = THOUSAND;
+
+ITERS = UNITY.TEN * UNITY.THOUSAND;
+ALLOCS = UNITY.THOUSAND;
 counter = 0;
 
 var conversion_buffer = new ArrayBuffer(8);
