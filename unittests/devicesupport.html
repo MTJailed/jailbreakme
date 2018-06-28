@@ -5,16 +5,11 @@
 	<script type="text/javascript" src="../modular.js"></script>
 	<script type="text/javascript">
 		window.exceptionarr = [];
-		pass = function(x){console.error(x);alert(x);window.exceptionarr.push(x);};
+		pass = function(x){x=x.stack;console.error(x);alert(x);window.exceptionarr.push(x);document.write('<b style=\'color:red\'>'+x);};
 		document.write = function(x){document.writeln(x+"<br>");};
 		try {
 			window.module_base = "../modules";
-			module('sha1');
-            module('sha');
-            module('md5');
-            module('devicesupport');
-            module('offsets');
-            module('sploit');
+            module('devicesupport.new');
             document.write('Loading of modules succeeded.');
 		} catch(exception) {
 			pass(exception);
@@ -22,47 +17,51 @@
 
 		function test2() {
 			try {
-				window.test = GetDPI();
-				document.write("GetDPI() succeeded.");
+				window.test = new Device();
+				document.write("Nameless instantiation and detection succeeded.");
+				document.write("Verbose:");
+				document.write(window.test.toString());
+				document.write('');
 			} catch(exception) {
 				pass(exception);
 			}
 
 			try {
-				window.test = GetGPU();
-				document.write("GetGPU() succeded.");
+				window.test = new Device('Barry');
+				document.write("Named instantiation and detection succeded.");
 			} catch(exception) {
 				pass(exception);
 			}
 
 			try {
-				window.test = getProductName();
-				document.write("GetProductName() succeeded.");
+				window.test = new Device('Barry', 'Poter', 'x', 2884884, 'f', 'a');
+				document.write("Instantiation with invalid arguments succeeded.");
 			} catch(exception) {
 				pass(exception);
 			}
 
 			try {
-				window.test = getOSVersionFromUA();
-				document.write("getOSVersionFromUA() succeeded.");
+				window.test = new Device();
+				if(window.test.identifier == null) throw new Error('Integration test failed. Device missing identifier.');
+				document.write("Integration test of identifier for devices succeeded.")
 			} catch(exception) {
 				pass(exception);
 			}
 
 			try {
-				window.test = getBuildFromUA();
-				document.write("getBuildFromUA() succeeded.");
+				window.test = convertBuild(11.31);
+				document.write("Numerical test for convertBuild succeeded.");
 			} catch(exception) {
 				pass(exception);
 			}
 
 			try {
-				window.test = BuildToVerson();
-				window.test = BuildToVerson("12H321");
+				window.test = convertBuild();
+				window.test = convertBuild("12H321");
 				if(window.test != 8.41) {
-					throw new Error('BuildToVerson mismatch version, expected 8.41, got: '+window.test);
+					throw new Error('convertBuild mismatch version, expected 8.41, got: '+window.test);
 				} else {
-					document.write("BuildToVerson() succeeded.");
+					document.write("convertBuild Integration test succeeded.");
 				}
 			} catch(exception) {
 				pass(exception);

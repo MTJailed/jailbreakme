@@ -29,60 +29,97 @@ module('offsets');
 module('devicesupport');
 module('verbosity');
 
-function printspecs() {
-    var device = window.chosendevice;
-    if(!device) puts('Please initialize your device first.');
-    //Print out the most important properties of the device
-    puts("<b>"+(device.productname ? device.productname : device.devicetype)+"</b> "+device.sw_vers+" ("+device.sw_build+")");
-    //puts("<b>Dots per inch: </b>"+device.dpi);
-    puts("<b>GPU: </b>"+device.gpu);
+var MAX_SUPPORT = {
+    os: 11.31,
+    safari: 604.1
 };
 
-function sploit_init() {
+function print_specifications() {
+   var device = current_device();
+   puts('<b>'+device.ProductName+'</b>');
+   puts('<b>OS: </b>'+device.OSVersion);
+   puts('<b>Build: </b>'+device.Build);
+   puts('<b>Webkit version: </b>'+device.Browser.webkit_vers);
+}
 
-    var MAX_SUPPORT = {os: 11.31, safari: 604.1};
-    var device = detectDevice(); window.chosendevice = device;
-    
-    var supported_browser = device.is_mobile && device.is_safari;
-    var supported_type = device.devicetype == "iPhone"  || device.devicetype == "iPad";
-    var supported_vers = device.sw_vers <= MAX_SUPPORT.os || parseInt(device.safari_vers) <= MAX_SUPPORT.safari;
+function supported_browser() {
+    var device = current_device();
+    return device.Browser.mobilesafari;
+}
 
-    if(!supported_browser) {
-        puts("Failed. This exploit only works on MobileSafari.");
+function supported_devicetype() {
+    var device = current_device();
+    return device.DeviceType === "iPhone" || device.DeviceType === "iPad" || device.DeviceType === "iPod";
+}
+
+function supported_osversion() {
+    var device = current_device();
+    return (device.OSVersion <= MAX_SUPPORT.os) && (device.Browser.safari_vers <= MAX_SUPPORT.safari);
+}
+
+function needs_offsets() {
+    var device = current_device();
+    return device.OSVersion >= 10;
+}
+
+function did_recognize() {
+    var device = current_device();
+    return (device.ProductName && device.OSVersion >= 10);
+}
+
+function osversion_between(min, max) {
+    var device = current_device();
+    return device.OSVersion >= min && device.OSVersion <= max;
+}
+
+
+function offsets_init() {
+    var device = current_device();
+    device.offsets = Offsets(device.OSVersion, device.ProductName);
+    if(!device.offsets) {
+        puts("Missing offsets for "+device.ProductName+" on "+device.OSVersion);
+        device.offsets = {};
         return false;
-    }
-
-    if(!supported_type) {
-        puts("Failed. This exploit only supports iPhone or iPad");
-        return false;
-    }
-
-    if(!supported_vers) {
-        puts("Failed. We do not support iOS higher than "+MAX_SUPPORT.os);
-        return false;
-    }
-
-    if(!device.productname && window.chosendevice.sw_vers >=10 ) {
-        puts("Device type couldn't be identified.");
-        return false;
-    }
-
-    if(window.chosendevice.sw_vers >= 10) {
-        window.chosendevice.offsets = Offsets(device.sw_vers, device.productname);
-
-        if(!window.chosendevice.offsets) {
-            puts("offsets missing for "+window.chosendevice.productname+", please report them.");
-            return false;
-        }
-
-        alert('Chose offsets: '+JSON.stringify(window.chosendevice.offsets));
-    } else {
-        window.chosendevice.offsets = {}; //not needed
     }
     return true;
 }
 
+function sploit_init() {
+    var device  = current_device();
+    
+    if(!supported_browser()) {
+        puts("This exploit only works on MobileSafari.");
+        return false;   
+    }
 
+    if(!supported_devicetype()) {
+        puts("This exploit only works on iOS devices.");
+        return false;
+    }
+
+    if(!supported_osversion()) {
+        puts("iOS higher than "+MAX_SUPPORT.os+" is not supported.");
+        return false;
+    }
+
+    if(!did_recognize()) {
+        puts("Could not recognize what device this is, are you sure this is iPhone?");
+    }
+
+    if(needs_offsets()) {
+        if(!offsets_init()) {
+            return false;
+        }
+    }
+
+    print_specifications();
+
+    return true;
+}
+
+
+
+//Loading modules takes time therefore this is an implementation of an async await javascript function
 function start_strategy(name) {
     window.await = setInterval(function(){
         if(eval(name) !== undefined) {
@@ -92,74 +129,78 @@ function start_strategy(name) {
     }, 250);
 }
 
+//Based on the detected device constraints the exploit to be used can be determined.
 function strategy_select() {
-    if(!window.chosendevice) return false;
+    var device = current_device();
+    if(!device) return false;
 
-    if(window.chosendevice.sw_vers >= 3.12 && window.chosendevice.sw_vers <= 4.01) {
+
+    if(osversion_between(3.12, 4.01)) {
+        puts('Chose star/saffron.');
         include('sploit.ancient');
         start_strategy('ancientgo');
         return true;
     }
 
-    else if(window.chosendevice.sw_vers >= 7.1 && window.chosendevice.sw_vers <= 7.12) {
-        puts("Chose CG Gangster for 7.1 - 7.1.2");
+    else if(osversion_between(7.1, 7.12)) {
+        puts('Chose CG Gangster exploit.');
         include('sploit.71');
         start_strategy('cg7go');
         return true;
     }
 
-    else if(window.chosendevice.sw_vers >= 9.0 && window.chosendevice.sw_vers < 9.35) {
-        puts("Chose to use Tihmstars jailbreak me");
+    else if(osversion_between(9.0, 9.34)) {
+        puts('Chose Tihmstar jbme');
         include('sploit.91x32');
-        start_strategy("wk91go");
+        start_strategy('wk91go');
         return true;
     }
 
-    else if(window.chosendevice.sw_vers === 11.3 || window.chosendevice.sw_vers === 11.31) {
-        puts("Chose to use Niklas B's jailbreak me.");
-
-        var supported_devices = ["iPhone 8", "iPhone 8+", "iPhone 6S", "iPhone 5S"];
+    else if(osversion_between(11.3, 11.31)) {
+        var supported_devices = ["iPhone 8", "iPhone 8+", "iPhone 6S", "iPhone 6+", "iPhone 5S"];
         var supported = false;
-
-        for(device = 0; device < supported_devices.length; device++) {
-            if(window.chosendevice.productname.indexOf(supported_devices[device]) > -1) {
-                supported = true;
-                break;
-            }
+        for(var i = 0; i < supported_devices.length && supported == false; i++) {
+            supported = device.ProductName.indexOf(supported_devices[i]) > -1;
         }
 
         if(supported) {
+            puts('Chose Niklas B\'s jailbreakme');
             include('sploit.1131');
-            start_strategy("wk113go");
+            start_strategy('wk113go');
             return true;
-    
         } else {
-            puts('Your '+(window.chosendevice.productname ? window.chosendevice.productname.join(' or ') : 'Unknown')+ " is not supported");
-            return false
+            puts('Your '+(device.ProductName ? device.ProductName.join(' or ') : 'Unknown device') + " is not supported");
+            return false;
         }
+
     }
+
     return false;
 }
 
 function sploit_main() {
-    //Initialize
-    if(!sploit_init()) return false;
-
-    var strategy = false;
-    var device = window.chosendevice;
-
-    printspecs(); //print the most important specifications of the device
-
-    var strategy = strategy_select();
-
-    try{ 
-        if(!strategy) {
-            puts("Your device or ios version isn't supported.");
+    try {
+        if(!sploit_init()) {
+            puts('Exploit initialization failed');
             return false;
         }
-    } catch(exception) {
-       alert("Exploit failed: "+exception);
+        var device = current_device();
+        var strategy = strategy_select();
+
+        try{ 
+
+            if(!strategy) {
+                puts("Your device or ios version isn't supported.");
+                return false;
+            }
+
+        } catch(exc) {
+           alert("Exploit failed: "+exc.stack);
+        }
+    } catch(exc) {
+        alert('Exception occured: '+exc.stack);
     }
+
     return true;
 }
 

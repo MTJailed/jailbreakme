@@ -1,7 +1,11 @@
-VERBOSITY_LOW = 0;
-VERBOSITY_DEFAULT = 1;
-VERBOSITY_HIGH = 2;
-VERBOSITY_VERBOSE = 3;
-verbosity = VERBOSITY_VERBOSE;
+//@enum VERBOSITY
+var VERBOSITY = {
+	LOW: 0,
+	DEFAULT: 1,
+	HIGH: 2,
+	VERBOSE: 3
+};
+//Default verbosity
+verbosity = VERBOSITY.DEFAULT;
 print = alert;//function(x){alert(x);puts(x)};
 

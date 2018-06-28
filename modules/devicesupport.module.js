@@ -1,237 +1,342 @@
-function supportsTouch(argument) {
+/*
+ *  Device Support Module
+ *  Can detect iOS Device properties by various algorithms
+*/
+module('sha');
+
+
+//Function for detecting the dots per inch of the screen
+function detectDPI(w, h) {
+    var dppx = window.devicePixelRatio || (window.matchMedia && window.matchMedia("(min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 1.5),(-moz-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)").matches? 2 : 1) || 1;
+    w = w * dppx;
+    h = h * dppx;
+    w > 0 || (w = 1);
+    h > 0 || (h = 1);
+    var dpi = Math.sqrt(w * w + h * h);
+    return dpi > 0 ? Math.round(dpi) : 0;
+}
+
+
+//Function for detecting whether the client has a touchscreen or not
+function detectTouchscreen() {
+
     return navigator.maxTouchPoints || navigator.msMaxTouchPoints || 'ontouchstart' in window;
 }
 
-function GetDPI() {
-    
-    //Element properties for getting DPI
-    var dpistyle = 'data-dpi-test { height: 1in; left: -100%; position: absolute; top: -100%; width: 1in; }';
-    var dpistyleelement = document.createElement('style');
-    var dpielement = document.createElement('data-dpi-test');
-    
-    dpistyleelement.setAttribute('type', 'text/css');
-    dpistyleelement.setAttribute('rel', 'stylesheet');
-    dpistyleelement.innerHTML = dpistyle;
-    dpistyleelement.setAttribute('id', 'dpi-style');
-    dpielement.setAttribute('id', 'dpi-test');
-    
-    //create the DPI element (1)
-    document.head.appendChild(dpistyleelement);
-    document.body.appendChild(dpielement);
-    
-    //get the dpi
-    var dpi = document.getElementById('dpi-test').offsetHeight;
-    
-    //remove the test elements
-    document.getElementById('dpi-test').remove();
-    document.getElementById('dpi-style').remove();
-    
-    return dpi;
+//Class for getting the Display specifications of the client
+var ScreenSpecs = function ScreenSpecs(width, height, dpi) {
+    this.width = width || window.screen.width || -1;
+    this.height = height || window.screen.height || -1;
+    this.dpi = dpi || detectDPI(this.width, this.height);
+    this.touchscreen = detectTouchscreen();
+    this.toString = function() {
+        return JSON.stringify(this);
+    };
 }
 
-function GetGPU() {
-    
-    var GPU = null;
-    
-    var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};
-    var gpuelement = document.createElement('canvas');
-    gpuelement.setAttribute('width', 0);
-    gpuelement.setAttribute('height', 0);
-    gpuelement.setAttribute('id', 'glcanvas');
-    document.body.appendChild(gpuelement);
-    var gl = document.getElementById('glcanvas').getContext('experimental-webgl');
-    var renderinfo = null;
-    try{
-        if(!gl.getExtension) {
-            GPU = false;
-            return false;
-        }
-        renderinfo = gl.getExtension("WEBGL_debug_renderer_info");
-        if(renderinfo) GPU = gl.getParameter(renderinfo.UNMASKED_RENDERER_WEBGL);
-        document.getElementById('glcanvas').remove();
-    } catch(ex) {
-        alert(ex);
-    }
-    if(!GPU) GPU = false;
-    return GPU;
-}
-
-function getProductName() {
-    var height = window.screen.height;
-    var width = window.screen.width;
-    var dpi = GetDPI();
-    var gpu = GetGPU();
-    
+//Function for parsing the GPU name to a simple Apple standard.
+function parseGPU(gpu) {
+    if(!gpu) return "Unknown GPU";
     if(gpu) gpu = gpu.split('Apple ');
-    if(gpu.length > 1) {
-        gpu = gpu[1].split(' GPU')[0];
-    } else {
-        gpu = false;
+    if(gpu.length > 1) gpu = gpu[1].split(' GPU')[0];
+    return gpu;
+}
+
+var GPUSpecs = function GPUSpecs() {
+    var ctx = document.createElement('canvas');
+    if(!ctx.getContext) return "Unknown GPU";
+    var gl = ctx.getContext('experimental-webgl');
+    if(!gl) gl = ctx.getContext('webgl');
+    if(!gl) return false;
+    if(!gl.getExtension || !gl.getParameter) return false;
+    debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if(!debugInfo) return false;
+    vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+    renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+    if(!vendor || !renderer) return false;
+    this.Name = parseGPU(renderer);
+    this.Vendor = vendor;
+    this.VRAM = 'NaN';
+};
+
+
+//Class for getting the Processor's specifications
+var CPUSpecs = function CPUSpecs(name, vendor, clockspeed, cores, threads, bits) {
+    this.Name = name || 'Unknown Processor';
+    this.Vendor = vendor || 'Unknown Vendor';
+    this.clockspeed = clockspeed || 'NaN';
+    this.cores = cores  || navigator.hardwareConcurrency || 'NaN';
+    this.threads = threads || 'NaN';
+    this.bits = bits || 'NaN';
+    this.toString = function() {
+        return JSON.stringify(this);
+    };
+}
+
+//Class for getting the Memory's specifications
+var RAMSpecs = function RAMSpecs(free, used, wired, maximumheap) {
+    this.Free = free || 'NaN';
+    this.Used = used || 'NaN';
+    this.Wired = wired || 'NaN';
+    this.HeapMax = maximumheap || 'NaN';
+    this.toString = function() {
+        JSON.stringify(this);
+    };
+}
+
+//Constant class for getting all hardware specifications from the client
+function detectHardwareSpecs(){
+    return {
+        screen: new ScreenSpecs(),
+        graphics: new GPUSpecs(),
+        cpu: new CPUSpecs(),
+        memory: new RAMSpecs()
+    };
+};
+
+//Class for getting the browser specifications from the client.
+var BrowserSpecs = function BrowserSpecs() {
+    this.mobile = (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    this.safari = window.navigator.userAgent.indexOf('Safari') > -1;
+    this.mobilesafari = this.mobile && this.safari;
+    this.webkit = window.navigator.userAgent.indexOf('AppleWebKit') > -1;
+    this.nvers = parseFloat(navigator.appVersion);
+    this.agent = navigator.userAgent;
+    this.name = navigator.appName || "";    
+    this.nickname = navigator.appCodeName || "";
+    this.platform = navigator.platform || "Unknown platform";
+    this.safari_vers = window.navigator.userAgent.indexOf('Safari') > -1 ? parseFloat(window.navigator.userAgent.split('Version/')[1]) : null;
+    this.webkit_vers = /AppleWebKit\/([\d.]+)/.exec(navigator.userAgent);
+    if(this.webkit_vers) this.webkit_vers = parseFloat(this.webkit_vers[1]);
+    this.toString = function() {
+        return JSON.stringify(this);
+    };
+
+};
+
+//Class for getting the localization specifications from the client.
+var LocaleSpecs = function LocaleSpecs() {
+    this.locale = navigator.systemLanguage || navigator.language;
+    this.timezone = new Date().toString().match(/([A-Z]+[\+-][0-9]+)/)[1];
+    this.toString = function() {
+        return JSON.stringify(this);
+    };
+};
+
+
+//Algorithm for detecting the iOS Firmware build version using the userAgent
+function detectBuild() {
+    var tmp = navigator.userAgent.indexOf('Mobile/') > -1;
+    if(tmp) {
+        tmp = navigator.userAgent.split('Mobile/');
+        if(tmp.length<1) return null;
+        return tmp[1].split(' ')[0];
     }
+    return null;
+}
+
+//Algorithm for detecting the iOS version using the userAgent
+function detectOSVersion() {
+     var match = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+      if(match) {
+        var version = [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3] || 0, 10)
+        ];
+        return parseFloat(version[0]+'.'+version[1]+version[2]);
+      }
+      return false;
+}
+
+//Algorithm for converting iOS build numbers to iOS OS Versions or iOS OS Versions to build numbers
+function convertBuild(str) {
+    if(typeof str !== 'string' && typeof str !== 'number') return null;
+    var build = [];
+    build['15F79'] = 11.4;
+    build['15E302'] = 11.31;
+    build['15E216'] = 11.301;
+    build['15E148'] = 11.300;
+    build['15D100'] = 11.26;
+    build['15D60'] = 11.22;
+    build['15C153'] = 11.21;
+    build['15C114'] = 11.2;
+    build['15B202'] = 11.12;
+    build['15B150'] = 11.11;
+    build['15B93'] = 11.1;
+    build['15A432'] = 11.03;
+    build['15A421'] = 11.02;
+    build['15A402'] = 11.01;
+    build['15A372'] = 11.0;
+    build['14G60'] = 10.33;
+    build['14F89'] = 10.32;
+    build['14E302'] = 10.31;
+    build['14E277'] = 10.3;
+    build['14D27'] = 10.21;
+    build['14C92']= 10.2;
+    build['14B150'] = 10.111;
+    build['14B100'] = 10.110;
+    build['14B72'] = 10.1;
+    build['14A456'] = 10.02;
+    build['14A403'] = 10.01;
+    build['13G36'] = 9.35;
+    build['13G35'] = 9.34;
+    build['13G34'] = 9.33;
+    build['13F69'] = 9.32;
+    build['13E238'] = 9.31;
+    build['13E233'] = 9.3;
+    build['13D20'] = 9.211;
+    build['13D15'] = 9.210;
+    build['13C75'] = 9.2;
+    build['13B143'] = 9.1;
+    build['13A452'] = 9.02;
+    build['13A404'] = 9.01;
+    build['13A344'] = 9.0;
+    build['12H321'] = 8.41;
+    build['12H143'] = 8.4;
+    build['12F70'] = 8.3;
+    build['12B466'] = 8.13;
+    build['12B440'] = 8.12;
+    build['12B436'] = 8.11;
+    build['12B411'] = 8.1;
+    build['12A405'] = 8.02;
+    build['12A402'] = 8.01;
+    build['12A365'] = 8.0;
     
-    /* iPhones */
-    
-    
-    if(width === 320 && height === 480 && gpu =='A4') return ['iPhone 4'];
-    
-    if(width === 320 && height === 480 && gpu == 'A5') return ['iPhone 4S'];
-    
-    if(width === 320 && height === 568 && gpu == 'A5') return ['iPhone 5'];
-    
-    if(width === 320 && height === 568 && gpu == 'A6') return ['iPhone 5C'];
-    
-    if(width === 320 && height === 568 && gpu == 'A7') return ['iPhone 5S'];
-    
-    if(width === 375 && height === 667 && gpu == 'A8') return ['iPhone 6'];
-    
-    if(width === 414 && height === 736 && gpu == 'A8') return ['iPhone 6+'];
-    
-    if(width === 375 && height === 667 && gpu == 'A9') return ['iPhone 6S'];
-    
-    if(width === 414 && height === 736 && gpu == 'A9') return ['iPhone 6S+'];
-    
-    if(width === 320 && height === 568 && gpu == 'A9') return ['iPhone SE'];
-    
-    if(width === 375 && height === 667 && gpu == 'A10') return ['iPhone 7'];
-    
-    if(width === 414 && height === 736 && gpu == 'A10') return ['iPhone 7+'];
-    
-    if(width === 375 && height === 667 && gpu == 'A11') return ['iPhone 8'];
-    
-    if(width === 414 && height === 736 && gpu == 'A11') return ['iPhone 8+'];
-    
-    if(width === 375 && height === 812 && gpu == 'A11') return ['iPhone X'];
-    
-    /* iPads */
-    if(width === 768 && height === 1024 && gpu == 'A5') return ['iPad Mini', 'iPad 2'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A7') return ['iPad Mini 2', 'iPad Mini 3', 'iPad Air'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A8') return ['iPad Mini 4'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A5X') return ['iPad 3'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A6X') return ['iPad 4'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A8X') return ['iPad Air 2'];
-    
-    if(width === 768 && height === 1024 && gpu == 'A9X') return ['9.7-inch iPad Pro'];
-    
-    if(width === 834 && height === 1112 && gpu == 'A10X') return ['10.5-inch iPad Pro'];
-    
-    if(width === 1024 && height === 1366 && gpu == 'A10X') return ['12.9-inch iPad Pro'];
-    
-    if(width === 272 && height === 340 && gpu == 'S1') return ['Watch 1 38mm'];
-    
-    if(width === 312 && height === 390 && gpu == 'S1') return ['Watch 1 42mm'];
-    
-    if(width === 272 && height === 340 && gpu == 'S1P') return ['Watch 1 sport 38mm'];
-    
-    if(width === 312 && height === 390 && gpu == 'S1P') return ['Watch 1 sport 42mm'];
-    
-    if(width === 272 && height === 340 && gpu == 'S2') return ['Watch 2 38mm'];
-    
-    if(width === 312 && height === 390 && gpu == 'S2') return ['Watch 2 42mm'];
-    
-    if(width === 272 && height === 340 && gpu == 'S3') return ['Watch 3 38mm'];
-    
-    if(width === 312 && height === 390 && gpu == 'S3') return ['Watch 3 42mm'];
-    
-    //Legacy
-    if(height <= 480) return ['iPhone 2G', 'iPhone 3', 'iPhone 3GS'];
-    
+    if(build[str]) {
+        return build[str];
+    }
+
+    for(var prop in build) {
+        if(build.hasOwnProperty(prop)) {
+            if(build[prop] === str) {
+                return prop;
+            }
+        }
+    }
+
     return false;
 }
 
 
+//Algorithm for detecting the device type from the userAgent
+function detectDeviceType() {
+    
+    if(navigator.userAgent.indexOf('iPhone') > -1) {
+        return "iPhone";
+    }
 
+    if(navigator.userAgent.indexOf('iPad') > -1) {
+        return "iPad";
+    }
 
-function getOSVersionFromUA() {
-    return parseFloat(('' + (/CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec(navigator.userAgent) || [0,''])[1]) .replace('undefined', '3_2').replace('_', '.').replace('_', '')) || false;
+    if(navigator.userAgent.indexOf('iPod') > -1) {
+        return "iPod";
+    }
+
+    return "UnitTest";
 }
 
-function getBuildFromUA() {
-    var tmp = navigator.userAgent.split('Mobile/');
-    tmp = (tmp.length > 1) ? tmp[1].split(' ') : null;
-    if(tmp) tmp = tmp[0];
-    return tmp;
-}
 
-function BuildToVerson(build) {
-    if(typeof build !== 'string') return null;
-    if(build == '15F79') return 11.4;
-    if(build == '15E302') return 11.31;
-    if(build == '15E216') return 11.301;
-    if(build == '15E148') return 11.300;
-    if(build == '15D100') return 11.26;
-    if(build == '15D60') return 11.22;
-    if(build == '15C153') return 11.21;
-    if(build == '15C114') return 11.2;
-    if(build == '15B202') return 11.12;
-    if(build == '15B150') return 11.11;
-    if(build == '15B93') return 11.1;
-    if(build == '15A432') return 11.03;
-    if(build == '15A421') return 11.02;
-    if(build == '15A402') return 11.01;
-    if(build == '15A372') return 11.0;
-    if(build == '14G60') return 10.33;
-    if(build == '14F89') return 10.32;
-    if(build == '14E302') return 10.31;
-    if(build == '14E277') return 10.3;
-    if(build == '14D27') return 10.21;
-    if(build == '14C92') return 10.2;
-    if(build == '14B150') return 10.111;
-    if(build == '14B100') return 10.110;
-    if(build == '14B72') return 10.1;
-    if(build == '14A456') return 10.02;
-    if(build == '14A403') return 10.01;
-    if(build == '13G36') return 9.35;
-    if(build == '13G35') return 9.34;
-    if(build == '13G34') return 9.33;
-    if(build == '13F69') return 9.32;
-    if(build == '13E238') return 9.31;
-    if(build == '13E233') return 9.3;
-    if(build == '13D20') return 9.211;
-    if(build == '13D15') return 9.210;
-    if(build == '13C75') return 9.2;
-    if(build == '13B143') return 9.1;
-    if(build == '13A452') return 9.02;
-    if(build == '13A404') return 9.01;
-    if(build == '13A344') return 9.0;
-    if(build == '12H321') return 8.41;
-    if(build == '12H143') return 8.4;
-    if(build == '12F70') return 8.3;
-    if(build == '12B466') return 8.13;
-    if(build == '12B440') return 8.12;
-    if(build == '12B436') return 8.11;
-    if(build == '12B411') return 8.1;
-    if(build == '12A405') return 8.02;
-    if(build == '12A402') return 8.01;
-    if(build == '12A365') return 8.0;
+//Algorithm for detecting the productname of the iOS client device based on producttype, resolution and GPU.
+function detectProductName(t, width, height, gpu) {
+
+    if(!t && !width && !height && !gpu) return false; //performance optimalisation
+
+    var dpi = detectDPI(width, height);
+
+
+    if(t === "iPhone") {
+        if(height <= 480) return ['iPhone 2G', 'iPhone 3', 'iPhone 3GS'];
+
+        if(width === 320 && height === 480 && gpu =='A4') return ['iPhone 4'];
+        
+        if(width === 320 && height === 480 && gpu == 'A5') return ['iPhone 4S'];
+        if(width === 320 && height === 568 && gpu == 'A5') return ['iPhone 5'];
+        
+        if(width === 320 && height === 568 && gpu == 'A6') return ['iPhone 5C'];
+        
+        if(width === 320 && height === 568 && gpu == 'A7') return ['iPhone 5S'];
+        
+        if(width === 375 && height === 667 && gpu == 'A8') return ['iPhone 6'];
+        if(width === 414 && height === 736 && gpu == 'A8') return ['iPhone 6+'];
+        
+        if(width === 375 && height === 667 && gpu == 'A9') return ['iPhone 6S'];
+        if(width === 414 && height === 736 && gpu == 'A9') return ['iPhone 6S+'];
+        if(width === 320 && height === 568 && gpu == 'A9') return ['iPhone SE'];
+        
+        if(width === 375 && height === 667 && gpu == 'A10') return ['iPhone 7'];
+        if(width === 414 && height === 736 && gpu == 'A10') return ['iPhone 7+'];
+        
+        if(width === 375 && height === 667 && gpu == 'A11') return ['iPhone 8'];
+        if(width === 414 && height === 736 && gpu == 'A11') return ['iPhone 8+'];
+        if(width === 375 && height === 812 && gpu == 'A11') return ['iPhone X'];
+    }
+
+    else if(t === "iPad") {
+        /* iPads */
+        if(width === 768 && height === 1024 && gpu == 'A5') return ['iPad Mini', 'iPad 2'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A7') return ['iPad Mini 2', 'iPad Mini 3', 'iPad Air'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A8') return ['iPad Mini 4'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A5X') return ['iPad 3'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A6X') return ['iPad 4'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A8X') return ['iPad Air 2'];
+        
+        if(width === 768 && height === 1024 && gpu == 'A9X') return ['9.7-inch iPad Pro'];
+        
+        if(width === 834 && height === 1112 && gpu == 'A10X') return ['10.5-inch iPad Pro'];
+        if(width === 1024 && height === 1366 && gpu == 'A10X') return ['12.9-inch iPad Pro'];
+    
+    } else {
+    
+        if(width === 272 && height === 340 && gpu == 'S1') return ['Watch 1 38mm'];
+        if(width === 312 && height === 390 && gpu == 'S1') return ['Watch 1 42mm'];
+        
+        if(width === 272 && height === 340 && gpu == 'S1P') return ['Watch 1 sport 38mm'];
+        if(width === 312 && height === 390 && gpu == 'S1P') return ['Watch 1 sport 42mm'];
+        
+        if(width === 272 && height === 340 && gpu == 'S2') return ['Watch 2 38mm'];
+        if(width === 312 && height === 390 && gpu == 'S2') return ['Watch 2 42mm'];
+        
+        if(width === 272 && height === 340 && gpu == 'S3') return ['Watch 3 38mm'];
+        if(width === 312 && height === 390 && gpu == 'S3') return ['Watch 3 42mm'];
+    }
     
     return false;
 }
 
-function detectDevice() {
-    var device = {};
-    
-    device.is_mobile = (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-    device.is_safari = device.is_mobile && (/Mobile/i.test(navigator.userAgent));
-    device.sw_build = getBuildFromUA();
-    device.sw_vers = BuildToVerson(device.sw_build) ||  getOSVersionFromUA();
-    device.webkit_vers = window.navigator.userAgent.indexOf('AppleWebKit') > -1 ? window.navigator.userAgent.split('AppleWebKit')[1].replace('/', '') : null;
-    device.safari_vers = window.navigator.userAgent.indexOf('Safari') > -1 ? window.navigator.userAgent.split('Version/')[1] : null;
-    device.language = navigator.systemLanguage || navigator.language;
-    device.timezone = String(String(new Date()).split("(")[1]).split(")")[0];
-    device.devicetype = (navigator.userAgent.match(/iPhone/i) ? "iPhone" : (navigator.userAgent.match(/iPad/i) ? "iPad" : null));
-    device.productname = getProductName();
-    device.gpu = GetGPU();
-    device.dpi = GetDPI();
-    device.identifier = Sha1.hash(navigator.userAgent+device.gpu+device.dpi+device.language+device.timezone+device.type+device.productname+device.sw_build+navigator.doNotTrack+device.language);
-    if(device.gpu) {
-        device.bit32 = parseInt(device.gpu.split('A')[0][0]) < 7;
+//Class for constructing a device and all of it's information
+var Device = function Device(name, type, productname, osversion, build, browser, localization, hardware, identifier) {
+    this.Name = name || 'UnitTest Device';
+    this.DeviceType = type || detectDeviceType();
+    this.Hardware = detectHardwareSpecs();
+    this.OSVersion = detectOSVersion() || "";
+    this.Build = detectBuild() || convertBuild(this.OSVersion);
+    this.Browser = new BrowserSpecs();
+    this.Localization = new LocaleSpecs();
+    this.ProductName = productname || detectProductName(this.DeviceType, this.Hardware.screen.width, this.Hardware.screen.height, this.Hardware.graphics.Name);
+    this.identifier = sha512_256(JSON.stringify(this));
+    this.toString = function() {
+        return JSON.stringify(this);
+    };
+};
+
+
+//returns the current device or gets the current device through detection
+function current_device() {
+    if(window.chosendevice) {
+        return window.chosendevice;
     } else {
-        device.bit32 = true;
+        window.chosendevice = new Device('Production device');
+        return window.chosendevice;
     }
-    return device;
 }
+
+
+
+
