@@ -44,7 +44,7 @@ function print_specifications() {
    puts('<b>OS: </b>'+device.OSVersion);
    puts('<b>Build: </b>'+device.Build);
    puts('<b>Webkit version: </b>'+device.Browser.webkit_vers);
-   puts('<b>DID: </b>'+device.identifier);
+   puts('<b>DID: </b><br>'+device.identifier);
 }
 
 //returns whether the exploit supports the client's browser or not

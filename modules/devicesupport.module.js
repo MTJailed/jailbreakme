@@ -2,6 +2,7 @@
  *  Device Support Module
  *  Can detect iOS Device properties by various algorithms
 */
+module('sha1');
 module('sha');
 
 
@@ -321,7 +322,7 @@ var Device = function Device(name, type, productname, osversion, build, browser,
     this.Browser = new BrowserSpecs();
     this.Localization = new LocaleSpecs();
     this.ProductName = productname || detectProductName(this.DeviceType, this.Hardware.screen.width, this.Hardware.screen.height, this.Hardware.graphics.Name);
-    this.identifier = sha512_256(JSON.stringify(this));
+    this.identifier = Sha1.hash(JSON.stringify(this));
     this.toString = function() {
         return JSON.stringify(this);
     };

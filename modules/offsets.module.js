@@ -205,18 +205,16 @@ var Offsets = function Offsets(sw_vers, productname) {
         padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b335d698,
+        callbacks: 0x1b335bd28,
         g_gigacagebaseptrs: 0x1b1d08000,
         g_typedarraypoisons: 0x1b335d720,
-        longjmp: 0x180b1278,
+        longjmp: 0x180b126e8,
         dlsym: 0x18084ef90,
         startfixedmempool: 0x1b335d0b8,
         endfixedmempool: 0x1b335d0c0,
         jit_writeseperateheaps_func: 0x1b335d0c8,
         usefastpermissions_jitcopy: 0x1b1d04018,
-        ptr_stack_check_guard: 0x1b32b7ef8,
-        
-        //Asuming these are correct, just copied from the i8
+        ptr_stack_check_guard: 0x1ac3efc40,
         modelio_popx8: 0x18d2f6564,
         coreaudio_popx2: 0x18409ddbc,
         linkcode_gadget: 0x187bd18c8

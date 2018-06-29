@@ -1,2 +1,7 @@
 # DISABLE CACHING
 Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+
+# ENFORCE SSL
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
