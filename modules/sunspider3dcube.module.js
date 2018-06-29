@@ -20,6 +20,9 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 */
+
+//Sun Spider Interval is a bench-marking algorithm.
+
 var _sunSpiderInterval = 0;
 function getSunSpiderInterval() {
     if (_sunSpiderInterval) return _sunSpiderInterval;

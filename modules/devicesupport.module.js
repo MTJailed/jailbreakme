@@ -42,6 +42,7 @@ function parseGPU(gpu) {
     return gpu;
 }
 
+//Class for getting the graphicscard's specifications
 var GPUSpecs = function GPUSpecs() {
     var ctx = document.createElement('canvas');
     if(!ctx.getContext) return "Unknown GPU";

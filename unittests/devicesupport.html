@@ -5,11 +5,11 @@
 	<script type="text/javascript" src="../modular.js"></script>
 	<script type="text/javascript">
 		window.exceptionarr = [];
-		pass = function(x){x=x.stack;console.error(x);alert(x);window.exceptionarr.push(x);document.write('<b style=\'color:red\'>'+x);};
+		pass = function(x){x=x.stack;console.error(x);alert(x);window.exceptionarr.push(x);document.write('<b style=\'color:red\'>'+x+'</b>');};
 		document.write = function(x){document.writeln(x+"<br>");};
 		try {
 			window.module_base = "../modules";
-            module('devicesupport.new');
+            module('devicesupport');
             document.write('Loading of modules succeeded.');
 		} catch(exception) {
 			pass(exception);
@@ -68,8 +68,8 @@
 			}
 
 			try {
-				window.test = detectDevice();
-				document.write("detectDevice() succeeded.");
+				window.test = current_device();
+				document.write("current_device() succeeded.");
 			} catch(exception) {
 				pass(exception);
 			}

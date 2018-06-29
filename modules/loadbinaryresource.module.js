@@ -1,4 +1,6 @@
 module('verbosity');
+
+//function for requesting a HTTP Resource such as a file, only supports GET as current.
 function load_binary_resource(url) {
     var req = new XMLHttpRequest();
     req.open('GET', url, false);

@@ -3,9 +3,11 @@
     Use radare: "/c ldr x8, [sp, 0x28]; ldr x0, [x8, 0x18]; ldp x29, x30, [sp, 0x50]; add sp, sp, 0x60; ret"
 */
 
+//Class for finding offsets by software version and product name
+//This may have to be updated one day when offsets become specific between different models with the same product name
 var Offsets = function Offsets(sw_vers, productname) {
     
-    var offsets = [];
+    var offsets = []; //This class uses a tree-based structure as it has been proven to be the fastest for lookups.
     
     //iPhones
     offsets["iPhone 2G"] = [];

@@ -1,3 +1,5 @@
+//IOMobileFrameBuffer-like way of drawing an Apple Logo onto a canvas using pixel buffers and Mathematical operations.
+
 function circle(context, x, y, radius) {
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI, false);
