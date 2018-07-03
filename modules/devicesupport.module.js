@@ -312,6 +312,32 @@ function detectProductName(t, width, height, gpu) {
     return false;
 }
 
+//check whether the architecture of the device is 32-bit or 64-bit
+function DetectArchitecture(productname, version) {
+    if(version >= 11) return 64;
+    if(version <= 4.9) return 32;
+
+    var x32_devices = [
+        'iPhone 2G',
+        'iPhone 3G',
+        'iPhone 3GS',
+        'iPhone 4',
+        'iPhone 4S',
+        'iPhone 5',
+        'iPhone 5C',
+        'iPad Mini',
+        'iPad 2'
+    ];
+
+    var bits = 64;
+    
+    for(i = 0; i < productname.length && bits!=32; i++) {
+        bits = (x32_devices.indexOf(productname[i]) != -1) ? 32 : 64;
+    }
+
+    return bits;
+}
+
 //Class for constructing a device and all of it's information
 var Device = function Device(name, type, productname, osversion, build, browser, localization, hardware, identifier) {
     this.Name = name || 'UnitTest Device';
@@ -322,6 +348,7 @@ var Device = function Device(name, type, productname, osversion, build, browser,
     this.Browser = new BrowserSpecs();
     this.Localization = new LocaleSpecs();
     this.ProductName = productname || detectProductName(this.DeviceType, this.Hardware.screen.width, this.Hardware.screen.height, this.Hardware.graphics.Name);
+    this.Architecture = DetectArchitecture();
     this.identifier = Sha1.hash(JSON.stringify(this));
     this.toString = function() {
         return JSON.stringify(this);
