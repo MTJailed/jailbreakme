@@ -348,7 +348,7 @@ var Device = function Device(name, type, productname, osversion, build, browser,
     this.Browser = new BrowserSpecs();
     this.Localization = new LocaleSpecs();
     this.ProductName = productname || detectProductName(this.DeviceType, this.Hardware.screen.width, this.Hardware.screen.height, this.Hardware.graphics.Name);
-    this.Architecture = DetectArchitecture();
+    this.Architecture = DetectArchitecture(this.ProductName, this.OSVersion);
     this.identifier = Sha1.hash(JSON.stringify(this));
     this.toString = function() {
         return JSON.stringify(this);

