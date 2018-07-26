@@ -9,8 +9,8 @@
  *      By Tihmstar
  */
 
-module('verbosity');
-module('loadbinaryresource');
+module('liblogging');
+module('libstorage');
 
 function getArrFromResource(res) {
     while (res.length % 4) {

@@ -8,9 +8,9 @@
  *		By Niklas B. from phoenhex
  *      Bug used: CVE-2018-4233 by Saelo
  */
-using('verbosity');
-using('memdump');
-using('int64');
+using('liblogging');
+using('libaddressspace');
+using('libc');
 
 
 var NO = false;

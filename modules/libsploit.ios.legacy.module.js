@@ -1,5 +1,5 @@
-using('verbosity');
-using('sunspider3dcube');
+using('liblogging');
+using('libdetect');
 
 var ancientgo = function() {
 	var agent = navigator.userAgent;

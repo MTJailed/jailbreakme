@@ -8,7 +8,7 @@
  *		ETA s0n                                           
  */
 
-using('verbosity');
+using('liblogging');
 
 //initialization
 var ctrladdr = 0;

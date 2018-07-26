@@ -1,3 +1,4 @@
+var LIBSPLOIT_STRATEGY = true;
 /***
  *         ██╗ █████╗ ██╗██╗     ██████╗ ██████╗ ███████╗ █████╗ ██╗  ██╗    ███╗   ███╗███████╗
  *         ██║██╔══██╗██║██║     ██╔══██╗██╔══██╗██╔════╝██╔══██╗██║ ██╔╝    ████╗ ████║██╔════╝
@@ -27,9 +28,9 @@
     - Please initialize all variables, this keeps the exploits stable
  */
 
-module('offsets'); //for offsets detection
-module('devicesupport'); //for client device detection
-module('verbosity'); //for verbosity functionality
+module('libsploit.ios.offsets'); //for offsets detection
+module('libdetect'); //for client device detection
+module('liblogging'); //for verbosity functionality
 
 //Configures the maximum supported operating system version or safari version
 var MAX_SUPPORT = {
@@ -150,21 +151,21 @@ function strategy_select() {
 
     if(osversion_between(3.12, 4.01)) {
         puts('Chose star/saffron.');
-        include('sploit.ancient');
+        include('libsploit.ios.legacy');
         start_strategy('ancientgo');
         return true;
     }
 
     else if(osversion_between(7.1, 7.12)) {
         puts('Chose CG Gangster exploit.');
-        include('sploit.71');
+        include('libsploit.ios.71');
         start_strategy('cg7go');
         return true;
     }
 
     else if(osversion_between(9.0, 9.34)) {
         puts('Chose Tihmstar jbme');
-        include('sploit.91x32');
+        include('libsploit.ios.91x32');
         start_strategy('wk91go');
         return true;
     }
@@ -187,7 +188,7 @@ function strategy_select() {
         if(supported) {
             
             puts('Chose Niklas B\'s jailbreakme');
-            include('sploit.1131'); //include the strategy module
+            include('libsploit.ios.1131'); //include the strategy module
             start_strategy('wk113go'); //schedule the strategy for launch
             return true;
 

@@ -2,8 +2,7 @@
  *  Device Support Module
  *  Can detect iOS Device properties by various algorithms
 */
-module('sha1');
-module('sha');
+using('libcrypto');
 
 
 //Function for detecting the dots per inch of the screen

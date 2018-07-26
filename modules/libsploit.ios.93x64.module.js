@@ -11,8 +11,8 @@
         By Luca Todesco                                                                                                                   
                                                                                                                    
                                                                                                                 */
-using('verbosity');
-using('loadbinaryresource');
+using('liblogging');
+using('libstorage');
 
 //Memory r/w buffers
 var mem0 = 0;

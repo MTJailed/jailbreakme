@@ -1,4 +1,5 @@
-module('verbosity');
+var LIBSTORAGE_LOADBINARYRESOURCE = true;
+using('liblogging');
 
 //function for requesting a HTTP Resource such as a file, only supports GET as current.
 function load_binary_resource(url) {

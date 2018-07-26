@@ -1,0 +1,1 @@
+var LIBSPLOIT_COOKIES = true;

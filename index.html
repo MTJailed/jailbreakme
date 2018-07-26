@@ -13,15 +13,19 @@
             <script type="text/javascript">
                 /* Configuration and Initialization */
             window.fuckoffwenetakidcounter = 0;
-            window.module_base = "modules";
+            ModularJS.config.modulebase = "modules";
             
             /* Module imports */
-            module('sha1');
-            module('sha');
-            module('md5');
-            module('sploit');
-            
+            Import('libcrypto');
+            Import('libsploit')
+            Import('libmacho');
+                
             /* Common functions */
+
+            function strip(html){
+               var doc = new DOMParser().parseFromString(html, 'text/html');
+               return doc.body.textContent || "";
+            }
             
             //counter to trigger a bug in the handling of URI schemes
             function vm_wenetakid_prot() {
@@ -48,6 +52,7 @@
         
             //Simple function to write formatted strings to the callback element
             function puts(str) {
+                console.log('[WebsploitFramework][Main]: '+strip(str.toString()));
                 document.write(str.toString()+"<br>");
             }
             </script>
@@ -58,6 +63,7 @@
             //This function is called when the users presses the start button
             var go = function() {
                 clear_callback();
+                console.log('[WebsploitFramework][Main]: '+'Starting...');
                 if(!sploit_main()) vm_wenetakid_prot(); 
             };
         </script>
@@ -83,6 +89,7 @@
         <main>
             <a class="go" href="#busy" id="go" onclick="go();">
                 Go
+                <noscript> (Please Enable Javascript) </noscript>
             </a>
         </main>
         <footer>
