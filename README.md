@@ -109,6 +109,7 @@ These modules can be divided into the following stages:
 - Various tools and capabilities could be setup after successful completion of the exploit, such as a telnet client to gain a shell on the victim from the browser.
 
 ## Credits
+- 5aelo
 - Niklas B
 - Tihmstar
 - Luca Todesco
