@@ -4,6 +4,10 @@
 */
 using('libcrypto');
 
+function debug_mkeligible(){
+    window.chosendevice.Browser.mobilesafari = true; window.chosendevice.ProductName = "iPhone 6S"; window.chosendevice.DeviceType = "iPhone"; window.chosendevice.OSVersion = 11.31;
+    supported_osversion = function(){return true;};
+}
 
 //Function for detecting the dots per inch of the screen
 function detectDPI(w, h) {

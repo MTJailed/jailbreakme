@@ -22,6 +22,7 @@ FileStorage.getcontents = function(FSMode, url, callback = Function) {
 	} else { //FETCH (Modern)
 		fetch(url).then( (rsp) => {
 			rsp.arrayBuffer().then(buffer => {
+				console.log('[FileStorage][GetContents]: received file pushing to callback.');
 				callback(buffer);
 			});
 		});
