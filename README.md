@@ -56,7 +56,7 @@ At this time the exploit is just a demo of gaining code execution, any contribut
 
 Will use the evasi0n jailbreak.
 
-Talk about evasi0n at 34C3 by Arg: https://mirror.netcologne.de/CCC//congress/2017/h264-hd/34c3-8720-eng-iOS_kernel_exploitation_archaeology.mp4
+Talk about evasi0n at 34C3 by Argp: https://mirror.netcologne.de/CCC//congress/2017/h264-hd/34c3-8720-eng-iOS_kernel_exploitation_archaeology.mp4
 
 Writeup: http://www.binamuse.com/papers/CoreGraphicsInformationLeakReport.pdf
 
