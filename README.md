@@ -68,13 +68,23 @@ How to compile: https://mirrors.sipsik.net/domonkos.tomcsanyi.net/index.html%3Fp
 
 #### 4.3.3: iPad 1, iPad 2, iPhone 3GS, iPhone 4 GSM, iPod 3rd gen, iPod 4th gen
 
+(Ancient Jailbreak ME)
+
 #### 4.3.2: iPad 1, iPhone 3GS, iPhone 4 GSM, iPod 3rd gen, iPod 4th gen
+
+(Ancient Jailbreak ME)
 
 #### 4.3: iPad 1, iPhone 3GS, iPhone 4 GSM, iPod 3rd gen, iPod 4th gen
 
+(Ancient Jailbreak ME)
+
 #### 4.2.8: iPhone 4 CDMA
 
+(Ancient Jailbreak ME)
+
 #### 4.2.7: iPhone 4 CDMA
+
+(Ancient Jailbreak ME)
 
 #### 4.2.6: iPhone 4 CDMA
 
