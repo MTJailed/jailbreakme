@@ -119,4 +119,5 @@ These modules can be divided into the following stages:
 - Argp
 - Evad3rs
 - Jonathan Levin (For the jailbreak toolkit)
+- Lokihardt (For being able to pwn browsers within a wink)
 - Sem Voigtländer (just a techie)
