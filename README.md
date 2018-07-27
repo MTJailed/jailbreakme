@@ -78,6 +78,35 @@ How to compile: https://mirrors.sipsik.net/domonkos.tomcsanyi.net/index.html%3Fp
 
 #### 4.2.6: iPhone 4 CDMA
 
+## How it works
+Using ModularJS various modules are loaded at runtime.
+
+These modules can be divided into the following stages:
+
+1. Identification
+- Uses an information leakage (not vulnerability) in WebGL to detect the GPU of the victim device
+- Uses the browser agent to define what browser and firmware to exploit
+- Uses size and resolution constraints to detect the specific victim device
+- Uses various debugging information about the hardware environment using window.performance or window.navigator
+- Uses benchmarking algorithms and hashing to identify and track the victim device.
+
+2. Eligibility
+- Using the identification information the victim is checked against various constraints, such as whether the victim is a mobile device or a desktop.
+
+3. Strategy selection
+- Based on the eligibility constraints and identity the exploit strategy will be selected for the victim device and loaded.
+
+4. Payload retrieval
+- The strategy will load the payload(s) for the victim device, on iOS this can be for example Cydia, on desktops for example a remote administration tool.
+- The payload is aligned so it can be used later when the exploit has created an executable region.
+
+5. Exploitation
+- The exploit is started and carefully sets up read/write primitives in the browser memory.
+- Once r/w is gained an executable region is created and the payload is aligned / copied into it.
+- The exploit jumps to the shellcode and starts executing it
+
+6. Post-Exploitation
+- Various tools and capabilities could be setup after successful completion of the exploit, such as a telnet client to gain a shell on the victim from the browser.
 
 ## Credits
 - Niklas B
