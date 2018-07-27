@@ -112,8 +112,11 @@ These modules can be divided into the following stages:
 - Niklas B
 - Tihmstar
 - Luca Todesco
+- KJC Research
 - Comex
 - PanguTeam
 - Ian Beer
+- Argp
+- Evad3rs
 - Jonathan Levin (For the jailbreak toolkit)
 - Sem Voigtländer (just a techie)
