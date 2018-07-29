@@ -21,9 +21,6 @@
  /* View */
  body, html {
  	background: #000000;
- 	background-size: cover;
- 	background-position: center;
- 	background-repeat: no-repeat;
  	margin: 0;
  	padding: 0;
  	font-size: 16px;
@@ -36,7 +33,6 @@
 body {
 	width: 100%;
 	height: 100%;
-
 }
 
 header {
@@ -59,22 +55,19 @@ main {
 	max-width: 90%;
 	background: rgba(252, 252, 252, 0.7);
 }
+
 .go, .go * {
 	text-align: center;
 	text-decoration: none;
 	font-weight: bold;
 	font-size: 15px !important;
 	border-radius: 7px;
-	
 	color: purple;
-	
 	display: inline-block;
 	box-decoration-break: slice;
-
 }
 
 footer {
 	padding-top: 25%;
 	text-align: center;
 }
-
