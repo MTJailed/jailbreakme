@@ -3,11 +3,71 @@
  *  Can detect iOS Device properties by various algorithms
 */
 using('libcrypto');
+using('libstorage');
+
+var detectRouter = function() {
+    var default_ips = [
+        '192.168.0.1',
+        '192.168.0.2',
+        '192.168.1.1',
+        '192.168.1.2',
+        '192.168.1.10',
+        '192.168.1.99',
+        '192.168.1.210',
+        '192.168.1.254',
+        '192.168.2.1',
+        '192.168.3.1',
+        '192.168.8.1',
+        '192.168.15.1',
+        '192.168.16.1',
+        '192.168.100.1',
+        '192.168.123.254',
+        '192.168.254.254',
+        '10.0.0.2',
+        '10.0.0.138',
+        '10.0.1.1',
+        '10.1.1.1',
+        '10.10.1.1'
+    ];
+    var found_ips = new Array();
+    for(i = 0; i < default_ips.length; i++) {
+        var ip = default_ips[i];
+        try{
+            var contents = FileStorage.getcontents(FileStorage.mode.XML, 'https://'+ip+'/');
+            if(contents) found_ips.push(ip);
+        } catch(e) {
+            console.log('No router at '+ip);
+        }
+    }
+    return found_ips.join(',');
+};
 
 function debug_mkeligible(){
-    window.chosendevice.Browser.mobilesafari = true; window.chosendevice.ProductName = "iPhone 6S"; window.chosendevice.DeviceType = "iPhone"; window.chosendevice.OSVersion = 11.31;
-    supported_osversion = function(){return true;};
+    window.chosendevice.Browser.mobilesafari = true; 
+    window.chosendevice.ProductName = "iPhone 6S"; 
+    window.chosendevice.DeviceType = "iPhone"; 
+    window.chosendevice.OSVersion = 11.31;
+    window.supported_osversion = function(){return true;};
 }
+
+
+var MobileEnvironmentDetails = function MobileEnvironmentDetails() {
+    this.AppleiOS = (
+        navigator.userAgent.indexOf('iPad')     >= 0 ||  
+        navigator.userAgent.indexOf('iPhone')   >= 0 || 
+        navigator.userAgent.indexOf('iPod')     >= 0
+    );
+    this.Homescreened = window.navigator.standalone ? true : false;
+    this.Orientation = (
+        window.orientation === 90 || window.orientation === -90
+    ) ? "landscape" : "portrait";
+    this.Webviewed = (
+        this.AppleiOS                                    && 
+        navigator.userAgent.indexOf('AppleWebKit')  >= 0 && 
+        navigator.userAgent.indexOf('Safari')       >= 0
+    );
+    this.Statusbarred = this.Webviewed && window.innerWidth * window.innerHeight  === screen.width * screen.height;
+};
 
 //Function for detecting the dots per inch of the screen
 function detectDPI(w, h) {
@@ -20,19 +80,33 @@ function detectDPI(w, h) {
     return dpi > 0 ? Math.round(dpi) : 0;
 }
 
-
-//Function for detecting whether the client has a touchscreen or not
-function detectTouchscreen() {
-
-    return navigator.maxTouchPoints || navigator.msMaxTouchPoints || 'ontouchstart' in window;
+//Functions for getting the Local IP address of the client
+function await_getipv4(timeout = 1000) {
+    var t1 = new Date();
+    while(!window.ipv4) {
+        var stop = new Date() - t1 >= timeout;
+        if(stop) {
+            console.error('timeout exceeded for await_getipv4.');
+            return "0.0.0.0";
+        }
+    }
+    return window.ipv4;
 }
+
+function async_getipv4() {
+    var ipv4 = null;
+    var findIP = new Promise(r=>{var w=window,a=new (w.RTCPeerConnection||w.mozRTCPeerConnection||w.webkitRTCPeerConnection)({iceServers:[]}),b=()=>{};a.createDataChannel("");a.createOffer(c=>a.setLocalDescription(c,b,b),b);a.onicecandidate=c=>{try{c.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g).forEach(r)}catch(e){}}})
+    findIP.then(ip => window.ipv4 = ip);
+    return await_getipv4();
+};
 
 //Class for getting the Display specifications of the client
 var ScreenSpecs = function ScreenSpecs(width, height, dpi) {
+    this.retina = (window.devicePixelRatio || 1) >= 2;
     this.width = width || window.screen.width || -1;
     this.height = height || window.screen.height || -1;
     this.dpi = dpi || detectDPI(this.width, this.height);
-    this.touchscreen = detectTouchscreen();
+    this.touchscreen = navigator.maxTouchPoints || navigator.msMaxTouchPoints || 'ontouchstart' in window;
     this.toString = function() {
         return JSON.stringify(this);
     };

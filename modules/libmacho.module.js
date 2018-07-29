@@ -3102,16 +3102,49 @@ var MachOParser = function MachOParser(url) {
 	};
 	FileStorage.getcontents(FileStorage.mode.FETCH, url, inlineParser);
 }
-function lookup_symbol() {
-	var symtabindex = -1;
-	for(lc = 0; lc < MachOParser.data.header.ncmds; lc++) {
-		if(MachOParser.data.loadCommands[lc].type === MachO.LoadCommandType.SYMTAB) {
-			symtabindex = lc;
-			break;
-		}
-	}
-	if(symtabindex < 0) return false;
-	for(sym = 0; sym < MachOParser.data.loadCommands[lc].body.nSyms; sym++) {
-		console.log(MachOParser.data.loadCommands[5].body.strs.items[MachOParser.data.loadCommands[lc].body.symbols[sym].un] + ' at ' + MachOParser.data.loadCommands[lc].body.symbols[sym].value);
-	}
+
+
+function get_symtab_command() {
+  var symtabindex = -1;
+  
+  for(lci = 0; lci < MachOParser.data.header.ncmds; lci++) {
+    if(MachOParser.data.loadCommands[lci].type == MachO.LoadCommandType.SYMTAB) {
+      symtabindex = lci;
+      break;
+    }
+  }
+
+  var foundSymtab = symtabindex != -1;
+  if(!foundSymtab) return false;
+
+  return MachOParser.data.loadCommands[lci].body;
+
+}
+
+function lookup_string_index(str) {
+  var symtab = get_symtab_command();
+  for(i = 0; i < symtab.strs.items.length; i++) {
+    if(str === symtab.strs.items[i]) return i;
+  }
+  return -1;
+}
+
+function lookup_symbol(symbol) {
+  
+  var contents = new Uint8Array(MachOParser.data._io.buffer);
+  var symtab = get_symtab_command();
+
+  var index = lookup_string_index(symbol);
+  if(index === -1) return false;
+  
+  var stroff = symtab.strs.items[index].length + symtab.strOff;
+  return stroff;
+}
+
+function dump(offset, size, arr) {
+  var tmp = [];
+  for(i = 0; i < size; i++) {
+    tmp.push(String.fromCharCode(arr[offset+i]));
+  }
+  console.log(tmp.join(''));
 }

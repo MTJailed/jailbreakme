@@ -14,8 +14,7 @@ using('libc');
 
 var memdump_addr = 0;
 
-var NO = false;
-var YES = true;
+
 
 var UNITY = {};
 UNITY.TEN = 10;
@@ -440,6 +439,7 @@ var pwn = function() {
 
     function legacy_execution() {
         alert('Legacy iPhones (< iPhone 8) can not be jailbroken yet.');
+        if(CONFIG.MEMORYDUMP_ENABLED) print('Memory Dump Result: \n'+memorydump(dlsym, CONFIG.MEMDUMP_SIZE, stage2));
     }
 
     function modern_execution() {

@@ -12,13 +12,13 @@ FileStorage.mode = {
 	FETCH: 1
 };
 
-FileStorage.getcontents = function(FSMode, url, callback = Function) {
+FileStorage.getcontents = function(FSMode, url, callback = Function, timeout = 500) {
 	if(!FSMode) { //XML (Legacy)
 		var req = new XMLHttpRequest();
 		req.open('GET', url, false);
     	req.overrideMimeType('text\/plain; charset=x-user-defined');
     	req.send(null);
-    	return req.status != 200 ? null : req.responseText;
+    	return req.status === 200 ? req.responseText : null;
 	} else { //FETCH (Modern)
 		fetch(url).then( (rsp) => {
 			rsp.arrayBuffer().then(buffer => {

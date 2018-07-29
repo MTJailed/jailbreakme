@@ -2,10 +2,15 @@ let EXIT_FAILURE = 1;
 let EXIT_SUCCESS = 0;
 let RAND_MAX = 0x7fffffff;
 
+var NO = false;
+var YES = true;
+
 var DEFINE = function(o) {
     eval("window."+o+"=true;");
 };
+
 var DEFINED = true || 1 || {};
+
 //Function for freeing an object on the window, well sortof.
 var JSFree = function(ptr) {
 	window[ptr] = undefined;

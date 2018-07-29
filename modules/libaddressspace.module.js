@@ -1,3 +1,5 @@
+include('libaddressspace.memdump');
+
 var PAGE_SIZE_16K = 1024 * 16;
 var PAGE_SIZE_4K = 4 * 1024;
 var HOST_PAGE_SIZE = {};
