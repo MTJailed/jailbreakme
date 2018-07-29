@@ -3,6 +3,8 @@ A webbased jailbreak solution unifying existing jailbreak me solutions and new o
 
 Created by Sem Voigtländer
 
+Please read ```RULES.md``` as well
+
 ## Support
 
 - 8.4.1 & 9.3 up to 9.3.3 & 11.3.1 (64-bit)
