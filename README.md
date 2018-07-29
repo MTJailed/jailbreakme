@@ -132,3 +132,4 @@ These modules can be divided into the following stages:
 - Jonathan Levin (For the jailbreak toolkit)
 - Lokihardt (For being able to pwn browsers within a wink)
 - Sem Voigtländer (just a techie)
+- (@wwwtyro) https://github.com/wwwtyro/cryptico
