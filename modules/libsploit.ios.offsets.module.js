@@ -155,7 +155,7 @@ var Offsets = function Offsets(sw_vers, productname) {
         longjmp: 0x180b12778,
         callbacks: 0x1b335d698,
         modelio_popx8: 0x18d2f6564, 
-        coreaudio_popx2: 0x18409ddbc, //Funny thing is that I spent WAY over an hour only to compare the difference between the 6s and the 8 and figure it out, LOL.
+        coreaudio_popx2: 0x18409ddbc, //Funny thing is that I spent WAY over an hour only to compare the difference between the 6s and the 8 and figure it out, LOL
         linkcode_gadget: 0 //Offsets taken from 11.3 should be the same, right?
     };
     
