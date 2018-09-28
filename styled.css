@@ -1,0 +1,102 @@
+body{
+  height: 100vh;
+  background-image: linear-gradient(#000032, #000015);
+  background-color: #00001a;
+}
+
+#logbox{
+  background: transparent;
+  color: white;
+  resize: none;
+  border: 1px solid transparent;
+  -moz-border-image: -moz-linear-gradient(top, #B700FF 0%, #4000FF 100%);
+  -webkit-border-image: -webkit-linear-gradient(top, #B700FF 0%, #4000FF 100%);
+  border-image: linear-gradient(to bottom, #B700FF 0%, #4000FF 100%);
+  border-image-slice: 1;
+  width: 100%;
+}
+
+
+/* ------ */
+/* Fonts */
+/* ------ */
+.quicksand {
+  font-family: 'Quicksand', sans-serif;
+}
+.roboto {
+  font-family: 'Roboto Mono', monospace;
+}
+.fredoka {
+  font-family: 'Fredoka One', cursive;
+}
+
+/* The Magic Button :) */
+.magicbtn{
+   font-size: 10vw;
+   font-family: 'Fredoka One', cursive;
+   background: -webkit-linear-gradient(#ff00ff, #1000ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: 1px solid transparent;
+  -moz-border-image: -moz-linear-gradient(top, #ff00ff 0%, #1000ff 100%);
+  -webkit-border-image: -webkit-linear-gradient(top, #ff00ff 0%, #1000ff 100%);
+  border-image: linear-gradient(to bottom, #ff00ff 0%, #1000ff 100%);
+  border-image-slice: 1;
+}
+
+/* ------------ */
+/* Animation 1! */
+/* ------------ */
+.animation {
+  -webkit-animation: rainbow 20s infinite;
+  -ms-animation: rainbow 20s infinite;
+  animation: rainbow 20s infinite;
+}
+
+@-webkit-keyframes rainbow{
+  0%{color: #ff0000;}
+	8%{color: #ff8000;}
+	17%{color: #ffff00;}
+	25%{color: #80ff00;}
+	33%{color: #40ff00;}
+	42%{color: #00ff40;}
+	50%{color: #00ffbf;}
+	58%{color: #00bfff;}
+	67%{color: #0040ff;}
+	75%{color: #4000ff;}
+  83%{color: #bf00ff;}
+  92%{color: #ff00bf;}
+  100%{color: #ff0040;}
+}
+
+@-ms-keyframes rainbow{
+  0%{color: #ff0000;}
+	8%{color: #ff8000;}
+	17%{color: #ffff00;}
+	25%{color: #80ff00;}
+	33%{color: #40ff00;}
+	42%{color: #00ff40;}
+	50%{color: #00ffbf;}
+	58%{color: #00bfff;}
+	67%{color: #0040ff;}
+	75%{color: #4000ff;}
+  83%{color: #bf00ff;}
+  92%{color: #ff00bf;}
+  100%{color: #ff0040;}
+}
+
+@keyframes rainbow{
+  0%{color: #ff0000;}
+	8%{color: #ff8000;}
+	17%{color: #ffff00;}
+	25%{color: #80ff00;}
+	33%{color: #40ff00;}
+	42%{color: #00ff40;}
+	50%{color: #00ffbf;}
+	58%{color: #00bfff;}
+	67%{color: #0040ff;}
+	75%{color: #4000ff;}
+  83%{color: #bf00ff;}
+  92%{color: #ff00bf;}
+  100%{color: #ff0040;}
+}
